@@ -22,15 +22,12 @@ library(dplyr)
 # fluxes among species and flooding treatments.
 # ============================================================
 
-# Overall flux range (using boxplot) for each gas, by tree species
 ggplot(my_data,aes(x = Species, y = CH4_lin_flux.estimate, fill = Plot)) +
   geom_boxplot() +
-  theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ggplot(my_data, aes(x = Species,  y = CO2_lin_flux.estimate, fill = Plot)) +
   geom_boxplot() +
-  theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 # ============================================================
@@ -42,16 +39,13 @@ ggplot(my_data, aes(x = Species,  y = CO2_lin_flux.estimate, fill = Plot)) +
 annual_means_CH4 <- my_data %>%
   group_by(Year, Species, Plot) %>%
   summarize( mean_flux = mean(CH4_lin_flux.estimate, na.rm = TRUE),
-             se = sd(CH4_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
+  se = sd(CH4_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
 
 ggplot(annual_means_CH4, aes( x = Year, y = mean_flux,color = Plot,group = Plot)) +
-  geom_line() +
-  geom_point(size = 2) +
-  geom_errorbar( aes(  ymin = mean_flux - se,ymax = mean_flux + se  ),width = 0.1 ) +
-  facet_wrap(~ Species) +
-  labs( title = "Mean CH4 Flux by Species and Plot (2021–2025)",
-        x = "Year", y = "Mean CH4 Flux" ) +
-  theme_bw()
+  geom_line() + geom_point(size = 2) + geom_errorbar(aes
+(ymin = mean_flux - se,ymax = mean_flux + se  ),width = 0.1 ) +
+  facet_wrap(~ Species) + labs( title = "Mean CH4 Flux by Species and Plot (2021–2025)", 
+x = "Year", y = "Mean CH4 Flux" ) 
 
 # ============================================================
 # Annual Mean CO2 Flux Trends
@@ -62,17 +56,13 @@ ggplot(annual_means_CH4, aes( x = Year, y = mean_flux,color = Plot,group = Plot)
 annual_means_CO2 <- my_data %>%
   group_by(Year, Species, Plot) %>%
   summarize( mean_flux = mean(CO2_lin_flux.estimate, na.rm = TRUE),
-             se = sd(CO2_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
+   se = sd(CO2_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
 
 ggplot(annual_means_CO2,aes( x = Year, y = mean_flux, color = Plot, group = Plot  )) +
-  geom_line() +
-  geom_point(size = 2) +
-  geom_errorbar( aes(ymin = mean_flux - se,ymax = mean_flux + se ), width = 0.1) +
-  facet_wrap(~ Species) +
-  labs( title = "Mean CO2 Flux by Species and Plot (2021–2025)",
-        x = "Year",
-        y = "Mean CO2 Flux" ) +
-  theme_bw()
+  geom_line() + geom_point(size = 2) +geom_errorbar(aes
+  (ymin = mean_flux - se,ymax = mean_flux + se ), width = 0.1) +
+  facet_wrap(~ Species) +labs( title = "Mean CO2 Flux by Species and Plot (2021–2025)",
+ x = "Year", y = "Mean CO2 Flux" ) +
 
 # ============================================================
 # Individual Tree CH4 Flux Through Time
@@ -81,8 +71,7 @@ ggplot(annual_means_CO2,aes( x = Year, y = mean_flux, color = Plot, group = Plot
 # ============================================================
 
 ggplot(my_data, aes(x = Date,  y = CH4_lin_flux.estimate, group = ID, color = Plot)) +
-  geom_line(alpha = 0.2) +
-  facet_wrap(~ Species) +
+  geom_line(alpha = 0.2) + facet_wrap(~ Species) +
   labs(title = "CH4 Flux Over Time by Species and Plot", x = "Date", y = "CH4 Flux")
 
 # ============================================================
