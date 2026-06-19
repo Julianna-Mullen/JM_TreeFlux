@@ -99,3 +99,4 @@ ggplot(my_data, aes(x = CO2_lin_flux.estimate, y = CH4_lin_flux.estimate, color 
 ggplot(my_data, aes(x = Plot, y = CH4_lin_flux.estimate, fill = Plot)) +geom_boxplot() + facet_wrap(~ Species) +labs( title = "CH4 Flux by Plot and Species",x = "Plot",y = "CH4 Flux", fill = "Plot")
 
 ggplot(my_data, aes(x = Plot, y = CO2_lin_flux.estimate, fill = Plot)) + geom_boxplot() + facet_wrap(~ Species) + labs(title = "CO2 Flux by Plot and Species",x = "Plot", y = "CO2 Flux", fill = "Plot")
+
