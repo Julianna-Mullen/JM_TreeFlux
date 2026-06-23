@@ -7,7 +7,26 @@ library(ggplot2)
 theme_set(theme_bw())
 
 # Read in data from Apache Parquet file -----
+library(arrow)
+library(dplyr)
 
+my_data <- read_parquet("tempest_tree_ghg_fluxes.parquet")
+
+code_to_name <- c(ACRU = "Red Maple", FAGR = "Beech", LITU = "Tulip Poplar")
+
+tree_map <- read.csv("ancillary_data/sapflow_tree_mapping.csv",
+                     stringsAsFactors = FALSE) %>%
+  mutate(across(where(is.character), trimws)) %>%
+  transmute(ID = Sapflux_ID,
+            Species_from_map = unname(code_to_name[Species_Code])) %>%
+  distinct(ID, .keep_all = TRUE)
+
+my_data <- my_data %>%
+  left_join(tree_map, by = "ID") %>%
+  mutate(Species = coalesce(Species, Species_from_map)) %>%
+  select(-Species_from_map)
+
+sum(is.na(my_data$Species))
 
 # Numerical summaries -----
 
