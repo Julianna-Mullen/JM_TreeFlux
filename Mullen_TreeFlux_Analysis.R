@@ -85,20 +85,33 @@ ggplot(annual_means_CO2,aes( x = Year, y = mean_flux, color = Plot, group = Plot
     y = "Mean CO2 Flux" ) +
   theme_bw()
 
-ggplot(my_data, aes(x = Date,  y = CH4_lin_flux.estimate, group = ID, color = Plot)) + geom_line(alpha = 0.2) + facet_wrap(~ Species) +
-    labs(title = "CH4 Flux Over Time by Species and Plot", x = "Date", y = "CH4 Flux")
+ggplot(my_data, aes(x = Date, y = CH4_lin_flux.estimate,
+                    group = ID, color = Plot)) +
+  geom_line(alpha = 0.2) +
+  facet_wrap(~ Species) +
+  labs(title = "CH4 Flux Over Time by Species and Plot",
+       x = "Date",
+       y = "CH4 Flux")
 
-ggplot(my_data, aes(x = Date,  y = CO2_lin_flux.estimate, group = ID, color = Plot)) + geom_line(alpha = 0.2) + facet_wrap(~ Species) +
-     labs(title = "CO2 Flux Over Time by Species and Plot", x = "Date", y = "CO2 Flux")
+ggplot(my_data, aes(x = Date,
+                    y = CO2_lin_flux.estimate,
+                    group = ID,
+                    color = Plot)) +
+  geom_line(alpha = 0.2) +
+  facet_wrap(~ Species) +
+  labs(
+    title = "CO2 Flux Over Time by Species and Plot",
+    x = "Date",
+    y = "CO2 Flux"
+  )
 
-heat_data_CH4 <- my_data %>%
-  group_by(Species, Year) %>%
-  summarize(mean_flux = mean(CH4_lin_flux.estimate, na.rm = TRUE), .groups = "drop" )
 ggplot(heat_data_CH4, aes(x = Year, y = Species, fill = mean_flux)) +
   geom_tile() +
   scale_fill_viridis_c() +
-  labs(title = "Mean CH4 Flux by Species and Year", x = "Year", y = "Species",
-    fill = "Mean CH4 Flux" ) + theme_minimal()
+  labs( title = "Mean CH4 Flux by Species and Year", x = "Year", y = "Species",
+    fill = "Mean CH4 Flux") + theme_minimal()
+seawater_rows <- my_data %>%
+  filter(Plot == "Seawater")
 
 heat_data_CO2 <- my_data %>%
   group_by(Species, Year) %>%
@@ -115,6 +128,52 @@ ggplot(my_data, aes(x = CO2_lin_flux.estimate, y = CH4_lin_flux.estimate, color 
     color = "Species") +
   theme_minimal()
 
-ggplot(my_data, aes(x = Plot, y = CH4_lin_flux.estimate, fill = Plot)) +geom_boxplot() + facet_wrap(~ Species) +labs( title = "CH4 Flux by Plot and Species",x = "Plot",y = "CH4 Flux", fill = "Plot")
+ggplot(my_data, aes(x = Plot,
+                    y = CH4_lin_flux.estimate,
+                    fill = Plot)) +
+  geom_boxplot() +
+  facet_wrap(~ Species) +
+  labs(
+    title = "CH4 Flux by Plot and Species",
+    x = "Plot",
+    y = "CH4 Flux",
+    fill = "Plot" )
 
-ggplot(my_data, aes(x = Plot, y = CO2_lin_flux.estimate, fill = Plot)) + geom_boxplot() + facet_wrap(~ Species) + labs(title = "CO2 Flux by Plot and Species",x = "Plot", y = "CO2 Flux", fill = "Plot")
+ggplot2::ggplot(my_data, aes(x = Plot, y = CO2_lin_flux.estimate, fill = Plot)) +
+  ggplot2::geom_boxplot() +
+  ggplot2::facet_wrap(~ Species) +
+  ggplot2::labs(
+    title = "CO2 Flux by Plot and Species",
+    x = "Plot",
+    y = "CO2 Flux",
+    fill = "Plot" )
+
+install.packages("lubridate")
+library(dplyr)
+library(lubridate)
+
+my_data <- my_data %>%
+  mutate(
+    Date = as.Date(Date),
+    Year = year(Date),
+    Quarter = quarter(Date))
+
+table(my_data$Quarter)
+
+quarterly_CH4 <- my_data %>%
+  group_by(Year, Quarter, Species, Plot) %>%
+  summarize(mean_flux = mean(CH4_lin_flux.estimate, na.rm = TRUE),
+    se = sd(CH4_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
+
+my_data <- my_data %>%
+  mutate( YearQuarter = paste0(Year, "-Q", Quarter))
+ggplot(quarterly_CH4,
+       aes(x = interaction(Year, Quarter),
+           y = mean_flux,
+           color = Plot,
+           group = Plot)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ Species) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs( x = "Year-Quarter",y = "CH4 Flux",title = "Quarterly CH4 Flux (2021–2025)" )               
