@@ -162,9 +162,13 @@ my_data <- my_data %>%
 table(my_data$Quarter)
 
 quarterly_CH4 <- my_data %>%
+  filter(ID != "S7") %>%
+  # filter out S7 
   group_by(YearQuarter, Species, Plot) %>%
   summarize(mean_flux = mean(CH4_lin_flux.estimate, na.rm = TRUE),
     se = sd(CH4_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
+
+# compute quarter CH4 for JUST S7
 
 # my_data <- my_data %>%
 #   mutate( YearQuarter = paste0(Year, "-Q", Quarter))
