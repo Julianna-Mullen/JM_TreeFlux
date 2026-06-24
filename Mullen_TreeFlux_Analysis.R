@@ -176,4 +176,30 @@ ggplot(quarterly_CH4,
   geom_point() +
   facet_wrap(~ Species) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs( x = "Year-Quarter",y = "CH4 Flux",title = "Quarterly CH4 Flux (2021–2025)" )               
+  labs( x = "Year-Quarter",y = "CH4 Flux",title = "Quarterly CH4 Flux (2021–2025)" )         
+
+my_data %>%
+  filter(Species == "Red Maple") %>%
+  group_by(ID) %>%
+  summarize(
+    n = n(),
+    mean_CH4 = mean(CH4_lin_flux.estimate, na.rm = TRUE),
+    sd_CH4 = sd(CH4_lin_flux.estimate, na.rm = TRUE),
+    mean_CO2 = mean(CO2_lin_flux.estimate, na.rm = TRUE),
+    sd_CO2 = sd(CO2_lin_flux.estimate, na.rm = TRUE)
+  ) %>%
+  arrange(desc(abs(mean_CH4)))
+
+my_data %>%
+   filter(Species == "Red Maple") %>%
+    ggplot(aes(x = Date, y = CH4_lin_flux.estimate)) +
+  geom_line(alpha = 0.7) +
+  facet_wrap(~ ID) +
+   theme_bw() +
+   labs(title = "Red Maple CH4 Flux by Individual Tree")
+ my_data %>%
+   filter(Species == "Red Maple") %>%
+    ggplot(aes(x = Date, y = CO2_lin_flux.estimate)) +
+   geom_line(alpha = 0.7) +
+   facet_wrap(~ ID) +
+   theme_bw()
