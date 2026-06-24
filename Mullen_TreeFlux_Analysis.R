@@ -156,19 +156,20 @@ my_data <- my_data %>%
   mutate(
     Date = as.Date(Date),
     Year = year(Date),
-    Quarter = quarter(Date))
+    Quarter = quarter(Date),
+    YearQuarter = Year + (Quarter-1)/4)
 
 table(my_data$Quarter)
 
 quarterly_CH4 <- my_data %>%
-  group_by(Year, Quarter, Species, Plot) %>%
+  group_by(YearQuarter, Species, Plot) %>%
   summarize(mean_flux = mean(CH4_lin_flux.estimate, na.rm = TRUE),
     se = sd(CH4_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
 
-my_data <- my_data %>%
-  mutate( YearQuarter = paste0(Year, "-Q", Quarter))
+# my_data <- my_data %>%
+#   mutate( YearQuarter = paste0(Year, "-Q", Quarter))
 ggplot(quarterly_CH4,
-       aes(x = interaction(Year, Quarter),
+       aes(x = YearQuarter,
            y = mean_flux,
            color = Plot,
            group = Plot)) +
