@@ -148,8 +148,6 @@ ggplot2::ggplot(my_data, aes(x = Plot, y = CO2_lin_flux.estimate, fill = Plot)) 
     y = "CO2 Flux",
     fill = "Plot" )
 
-install.packages("lubridate")
-library(dplyr)
 library(lubridate)
 
 my_data <- my_data %>%
@@ -162,13 +160,11 @@ my_data <- my_data %>%
 table(my_data$Quarter)
 
 quarterly_CH4 <- my_data %>%
-  filter(ID != "S7") %>%
-  # filter out S7 
-  group_by(YearQuarter, Species, Plot) %>%
+  mutate(is_S7 = ID == "S7") %>%
+  group_by(YearQuarter, Species, Plot, is_S7) %>%
   summarize(mean_flux = mean(CH4_lin_flux.estimate, na.rm = TRUE),
     se = sd(CH4_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
 
-# compute quarter CH4 for JUST S7
 
 # my_data <- my_data %>%
 #   mutate( YearQuarter = paste0(Year, "-Q", Quarter))
@@ -176,7 +172,7 @@ ggplot(quarterly_CH4,
        aes(x = YearQuarter,
            y = mean_flux,
            color = Plot,
-           group = Plot)) +
+           linetype = is_S7)) +
   geom_line() +
   geom_point() +
   facet_wrap(~ Species) +
