@@ -5,11 +5,21 @@ message("Welcome to the TEMPEST Flood Tree Greenhouse Gas Flux dataset analysis"
 
 library(ggplot2)
 theme_set(theme_bw())
+library(dplyr)
+library(lubridate)
+library(compasstools)
+
+# Flood dates
+
+flood_date <- tribble(~Event, ~Start, ~End,
+                      "T1", "2022-06-22", "2022-06-22",
+                      "T2", "2023-06-06", "2023-06-07",
+                      "T3", "2024-06-11", "2024-06-13")
+flood_date$Start <- ymd(flood_date$Start)
+flood_date$End <- ymd(flood_date$End)
 
 # Read in data from Apache Parquet file -----
 library(arrow)
-library(dplyr)
-
 my_data <- read_parquet("tempest_tree_ghg_fluxes.parquet")
 
 code_to_name <- c(ACRU = "Red Maple", FAGR = "Beech", LITU = "Tulip Poplar")
@@ -57,6 +67,7 @@ ggplot(my_data, aes(x = Species,  y = CO2_lin_flux.estimate, fill = Plot)) +
     geom_boxplot() +
    theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 annual_means_CH4 <- my_data %>%
   group_by(Year, Species, Plot) %>%
@@ -148,7 +159,6 @@ ggplot2::ggplot(my_data, aes(x = Plot, y = CO2_lin_flux.estimate, fill = Plot)) 
     y = "CO2 Flux",
     fill = "Plot" )
 
-library(lubridate)
 
 my_data <- my_data %>%
   mutate(
@@ -165,6 +175,21 @@ quarterly_CH4 <- my_data %>%
   summarize(mean_flux = mean(CH4_lin_flux.estimate, na.rm = TRUE),
     se = sd(CH4_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
 
+# We want flood-week averages for reference
+flood_data <- list()
+for(i in seq_len(nrow(flood_date))) {
+  message("Isolating data for ", flood_date$Event[i])
+  my_data %>%
+    filter(Date >= flood_date$Start[i], Date <= flood_date$End[i]) ->
+    flood_data[[i]]
+}
+# Now we have the data for only flood days; summarize just like above
+flood_CH4 <- bind_rows(flood_data) %>%
+  mutate(is_S7 = ID == "S7") %>%
+  group_by(YearQuarter, Species, Plot, is_S7) %>%
+  summarize(mean_flux = mean(CH4_lin_flux.estimate, na.rm = TRUE),
+            se = sd(CH4_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
+
 
 # my_data <- my_data %>%
 #   mutate( YearQuarter = paste0(Year, "-Q", Quarter))
@@ -177,7 +202,9 @@ ggplot(quarterly_CH4,
   geom_point() +
   facet_wrap(~ Species) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs( x = "Year-Quarter",y = "CH4 Flux",title = "Quarterly CH4 Flux (2021–2025)" )         
+  labs( x = "Year-Quarter",y = "CH4 Flux",title = "Quarterly CH4 Flux (2021–2025)" ) +
+  # show flood week data
+  geom_point(data = flood_CH4, size = 4)
 
 my_data %>%
   filter(Species == "Red Maple") %>%
@@ -204,3 +231,5 @@ my_data %>%
    geom_line(alpha = 0.7) +
    facet_wrap(~ ID) +
    theme_bw()
+
+ 
