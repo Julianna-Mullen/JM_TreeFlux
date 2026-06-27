@@ -1,0 +1,104 @@
+---
+title: "Mullen TreeFlux Analysis"
+author: "JM"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+Welcome to the TEMPEST Flood Tree Greenhouse Gas Flux dataset analysis!
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ggplot2)
+theme_set(theme_bw())
+library(dplyr)
+library(lubridate)
+library(compasstools)
+library(arrow)
+```
+
+# TEMPEST flood dates
+
+```{r flood-dates}
+flood_date <- tribble(~Event, ~Start, ~End,
+                      "T1", "2022-06-22", "2022-06-22",
+                      "T2", "2023-06-06", "2023-06-07",
+                      "T3", "2024-06-11", "2024-06-13")
+flood_date$Start <- ymd(flood_date$Start)
+flood_date$End <- ymd(flood_date$End)
+
+knitr::kable(flood_date)
+```
+
+# Read data
+
+```{r read-data}
+# Read in data from Apache Parquet file -----
+FLUX_DATA_FILE <- "tempest_tree_ghg_fluxes.parquet"
+message("Reading ", FLUX_DATA_FILE)
+my_data <- read_parquet(FLUX_DATA_FILE)
+
+code_to_name <- c(ACRU = "Red Maple", FAGR = "Beech", LITU = "Tulip Poplar")
+
+TREE_MAPPING_FILE <- "ancillary_data/sapflow_tree_mapping.csv"
+message("Reading ", TREE_MAPPING_FILE)
+tree_map <- read.csv(TREE_MAPPING_FILE,
+                     stringsAsFactors = FALSE) %>%
+  mutate(across(where(is.character), trimws)) %>%
+  transmute(ID = Sapflux_ID,
+            Species_from_map = unname(code_to_name[Species_Code])) %>%
+  distinct(ID, .keep_all = TRUE)
+
+my_data <- my_data %>%
+  left_join(tree_map, by = "ID") %>%
+  mutate(Species = coalesce(Species, Species_from_map)) %>%
+  select(-Species_from_map)
+
+message("Trees with NA species: ", sum(is.na(my_data$Species)))
+```
+
+# Numerical summaries
+
+```{r numerical-summaries}
+print(my_data)
+# BBL: print summary of fluxes? A table with mean, min, max and date ranges
+```
+
+# Plots
+
+## Overall data, by species
+
+```{r overall-by-species}
+my_data %>%
+  ggplot(aes( x = Year, y = CH4_lin_flux.estimate, color = Plot )) +
+  geom_point(alpha = 0.6) +
+  facet_wrap(~ Species) +
+  labs( title = "CH4 Flux by Species (2021–2025)" )
+
+my_data %>%
+  ggplot(aes( x = Year, y = CO2_lin_flux.estimate, color = Plot )) +
+  geom_point(alpha = 0.6) +
+  facet_wrap(~ Species) +
+  labs( title = "CO2 Flux by Species (2021–2025)", y = "CO2 Flux" )
+```
+
+## Flux ranges by species
+
+```{r flux-ranges}
+# Overall flux range (using boxplot) for each gas, by tree species
+ggplot(my_data,aes(x = Species, y = CH4_lin_flux.estimate, fill = Plot)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(my_data, aes(x = Species,  y = CO2_lin_flux.estimate, fill = Plot)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
