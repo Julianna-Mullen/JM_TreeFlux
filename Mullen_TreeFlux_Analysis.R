@@ -21,7 +21,6 @@ flood_date$End <- ymd(flood_date$End)
 # Read in data from Apache Parquet file -----
 library(arrow)
 my_data <- read_parquet("tempest_tree_ghg_fluxes.parquet")
-
 code_to_name <- c(ACRU = "Red Maple", FAGR = "Beech", LITU = "Tulip Poplar")
 
 tree_map <- read.csv("ancillary_data/sapflow_tree_mapping.csv",
