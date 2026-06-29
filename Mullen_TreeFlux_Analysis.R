@@ -6,6 +6,7 @@ message("Welcome to the TEMPEST Flood Tree Greenhouse Gas Flux dataset analysis"
 library(ggplot2)
 theme_set(theme_bw())
 library(dplyr)
+library(arrow)
 library(lubridate)
 library(compasstools)
 
@@ -19,7 +20,6 @@ flood_date$Start <- ymd(flood_date$Start)
 flood_date$End <- ymd(flood_date$End)
 
 # Read in data from Apache Parquet file -----
-library(arrow)
 my_data <- read_parquet("tempest_tree_ghg_fluxes.parquet")
 code_to_name <- c(ACRU = "Red Maple", FAGR = "Beech", LITU = "Tulip Poplar")
 
@@ -56,6 +56,13 @@ soil_temp_daily <- soil_temp_data %>%
     .groups = "drop"  )
 print(soil_temp_daily)
 
+### Graphs of Soil Temp Data (Daily averages over time)
+ggplot(soil_temp_daily,aes(x = Date, y = soil_temp_daily_mean,
+color = Plot, group = Plot)) + geom_line(alpha = 0.7) + facet_wrap(~ Site) +
+labs( title = "Daily Mean Soil Temperature by Plot",
+   x = "Date",
+   y = "Soil Temperature (°C)" ) 
+
 # Numerical summaries -----
 
 print(my_data)
@@ -78,13 +85,10 @@ my_data %>%
 # Overall flux range (using boxplot) for each gas, by tree species
 ggplot(my_data,aes(x = Species, y = CH4_lin_flux.estimate, fill = Plot)) +
    geom_boxplot() +
-  theme_bw() +
  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ggplot(my_data, aes(x = Species,  y = CO2_lin_flux.estimate, fill = Plot)) +
-    geom_boxplot() +
-   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 annual_means_CH4 <- my_data %>%
@@ -98,7 +102,7 @@ ggplot(annual_means_CH4, aes( x = Year, y = mean_flux,color = Plot,group = Plot)
   facet_wrap(~ Species) +
   labs( title = "Mean CH4 Flux by Species and Plot (2021–2025)",
         x = "Year", y = "Mean CH4 Flux" ) +
-  theme_bw()
+  
 
 annual_means_CO2 <- my_data %>%
   group_by(Year, Species, Plot) %>%
@@ -112,7 +116,6 @@ ggplot(annual_means_CO2,aes( x = Year, y = mean_flux, color = Plot, group = Plot
   labs( title = "Mean CO2 Flux by Species and Plot (2021–2025)",
     x = "Year",
     y = "Mean CO2 Flux" ) +
-  theme_bw()
 
 ggplot(my_data, aes(x = Date, y = CH4_lin_flux.estimate,
                     group = ID, color = Plot)) +
@@ -241,13 +244,9 @@ my_data %>%
     ggplot(aes(x = Date, y = CH4_lin_flux.estimate)) +
   geom_line(alpha = 0.7) +
   facet_wrap(~ ID) +
-   theme_bw() +
    labs(title = "Red Maple CH4 Flux by Individual Tree")
  my_data %>%
    filter(Species == "Red Maple") %>%
     ggplot(aes(x = Date, y = CO2_lin_flux.estimate)) +
    geom_line(alpha = 0.7) +
-   facet_wrap(~ ID) +
-   theme_bw()
-
- 
+   facet_wrap(~ ID) 

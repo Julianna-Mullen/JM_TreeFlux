@@ -63,28 +63,54 @@ message("Trees with NA species: ", sum(is.na(my_data$Species)))
 ```
 
 # Prep Soil Temp Data
-
 ```{r}
 read_L2_variable(variable = "soil-temp-5cm", path = "Sensor_Data/", quiet=TRUE)
 ```
 ## Take daily avg
 ```{r}
 soil_temp_data <- read_L2_variable(variable = "soil-temp-5cm",
-path = "Sensor_Data/", quiet = TRUE)
+                                   path = "Sensor_Data/", quiet = TRUE)
 soil_temp_daily <- soil_temp_data %>%
   mutate(
     TIMESTAMP = as.POSIXct(TIMESTAMP),
-       Date = as.Date(TIMESTAMP),
-        Value = as.numeric(Value) ) %>%
-    filter(!is.na(Value)) %>%  
-   group_by(Site, Plot, Date) %>%
-   summarise(
-        soil_temp_daily_mean = mean(Value),
-        n = n(),
-         coverage = n / 480,      
-         .groups = "drop"  )
+    Date = as.Date(TIMESTAMP),
+    Value = as.numeric(Value) ) %>%
+  filter(!is.na(Value)) %>%  
+  group_by(Site, Plot, Date) %>%
+  summarise(
+    soil_temp_daily_mean = mean(Value),
+    n = n(),
+    coverage = n / 480,      
+    .groups = "drop"  )
 print(soil_temp_daily)
 ```
+## Graphs of Soil Temp Data (Daily averages over time)
+```{r}
+ggplot(soil_temp_daily,aes(x = Date, y = soil_temp_daily_mean,
+color = Plot, group = Plot)) + geom_line(alpha = 0.7) + facet_wrap(~ Site) +
+labs( title = "Daily Mean Soil Temperature by Plot",
+   x = "Date",
+   y = "Soil Temperature (°C)" ) 
+```
+
+# Numerical summaries -----
+
+print(my_data)
+# BBL: print summary of fluxes? A table with mean, min, max and date ranges
+
+
+ my_data %>%
+   ggplot(aes( x = Year, y = CH4_lin_flux.estimate, color = Plot )) +
+   geom_point(alpha = 0.6) +
+   facet_wrap(~ Species) +
+   labs( title = "CH4 Flux by Species (2021–2025)" )
+
+my_data %>%
+  ggplot(aes( x = Year, y = CO2_lin_flux.estimate, color = Plot )) +
+  geom_point(alpha = 0.6) +
+  facet_wrap(~ Species) +
+  labs( title = "CO2 Flux by Species (2021–2025)", y = "CO2 Flux" )
+
 
 # Numerical summaries
 
@@ -125,4 +151,3 @@ ggplot(my_data, aes(x = Species,  y = CO2_lin_flux.estimate, fill = Plot)) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-
