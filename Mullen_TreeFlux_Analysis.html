@@ -1641,6 +1641,51 @@ my_data &lt;- my_data %&gt;%
 message(&quot;Trees with NA species: &quot;, sum(is.na(my_data$Species)))</code></pre>
 <pre><code>## Trees with NA species: 0</code></pre>
 </div>
+<div id="prep-soil-temp-data" class="section level1">
+<h1>Prep Soil Temp Data</h1>
+<pre class="r"><code>read_L2_variable(variable = &quot;soil-temp-5cm&quot;, path = &quot;Sensor_Data/&quot;, quiet=TRUE)</code></pre>
+<pre><code>## # A tibble: 3,156,480 × 12
+##    Site  Plot  TIMESTAMP           Instrument Instrument_ID Sensor_ID Location
+##    &lt;chr&gt; &lt;chr&gt; &lt;dttm&gt;              &lt;chr&gt;      &lt;chr&gt;         &lt;chr&gt;     &lt;chr&gt;   
+##  1 TMP   C     2020-01-01 00:00:00 TEROS12    12            T108      C6      
+##  2 TMP   C     2020-01-01 00:00:00 TEROS12    12            T131      H6      
+##  3 TMP   C     2020-01-01 00:00:00 TEROS12    11            T138      C3      
+##  4 TMP   C     2020-01-01 00:00:00 TEROS12    13            T174      H3      
+##  5 TMP   C     2020-01-01 00:00:00 TEROS12    13            T177      F4      
+##  6 TMP   C     2020-01-01 00:15:00 TEROS12    12            T108      C6      
+##  7 TMP   C     2020-01-01 00:15:00 TEROS12    12            T131      H6      
+##  8 TMP   C     2020-01-01 00:15:00 TEROS12    11            T138      C3      
+##  9 TMP   C     2020-01-01 00:15:00 TEROS12    13            T174      H3      
+## 10 TMP   C     2020-01-01 00:15:00 TEROS12    13            T177      F4      
+## # ℹ 3,156,470 more rows
+## # ℹ 5 more variables: research_name &lt;chr&gt;, Value &lt;dbl&gt;, N_avg &lt;int&gt;,
+## #   N_drop &lt;int&gt;, Value_MAC &lt;dbl&gt;</code></pre>
+<div id="take-daily-avg" class="section level2">
+<h2>Take daily avg</h2>
+<pre class="r"><code>soil_temp_data &lt;- read_L2_variable(variable = &quot;soil-temp-5cm&quot;,
+path = &quot;Sensor_Data/&quot;, quiet = TRUE)
+soil_temp_daily &lt;- soil_temp_data %&gt;%
+mutate(Date = as.Date(TIMESTAMP)) %&gt;%
+group_by(Site, Plot, Date) %&gt;%
+summarise(soil_temp_daily_mean = mean(Value, na.rm = TRUE),
+n = sum(!is.na(Value)), .groups = &quot;drop&quot; )
+print(soil_temp_daily)</code></pre>
+<pre><code>## # A tibble: 6,576 × 5
+##    Site  Plot  Date       soil_temp_daily_mean     n
+##    &lt;chr&gt; &lt;chr&gt; &lt;date&gt;                    &lt;dbl&gt; &lt;int&gt;
+##  1 TMP   C     2020-01-01                  NaN     0
+##  2 TMP   C     2020-01-02                  NaN     0
+##  3 TMP   C     2020-01-03                  NaN     0
+##  4 TMP   C     2020-01-04                  NaN     0
+##  5 TMP   C     2020-01-05                  NaN     0
+##  6 TMP   C     2020-01-06                  NaN     0
+##  7 TMP   C     2020-01-07                  NaN     0
+##  8 TMP   C     2020-01-08                  NaN     0
+##  9 TMP   C     2020-01-09                  NaN     0
+## 10 TMP   C     2020-01-10                  NaN     0
+## # ℹ 6,566 more rows</code></pre>
+</div>
+</div>
 <div id="numerical-summaries" class="section level1">
 <h1>Numerical summaries</h1>
 <pre class="r"><code>print(my_data)</code></pre>

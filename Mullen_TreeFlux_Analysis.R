@@ -37,6 +37,25 @@ my_data <- my_data %>%
 
 sum(is.na(my_data$Species))
 
+# Prep Soil Temp Data
+read_L2_variable(variable = "soil-temp-5cm", path = "Sensor_Data/", quiet=TRUE)
+## Take daily avg
+soil_temp_data <- read_L2_variable(variable = "soil-temp-5cm",
+                                   path = "Sensor_Data/", quiet = TRUE)
+soil_temp_daily <- soil_temp_data %>%
+  mutate(
+    TIMESTAMP = as.POSIXct(TIMESTAMP),
+    Date = as.Date(TIMESTAMP),
+    Value = as.numeric(Value) ) %>%
+  filter(!is.na(Value)) %>%  
+  group_by(Site, Plot, Date) %>%
+  summarise(
+    soil_temp_daily_mean = mean(Value),
+    n = n(),
+    coverage = n / 480,      
+    .groups = "drop"  )
+print(soil_temp_daily)
+
 # Numerical summaries -----
 
 print(my_data)
