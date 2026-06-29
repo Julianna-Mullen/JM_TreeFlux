@@ -1,13 +1,8 @@
 ---
 title: "Mullen TreeFlux Analysis"
 author: "JM"
-date: "`r Sys.Date()`"
+date: '`r Sys.Date()`'
 output:
-  html_document:
-    toc: true
-    toc_float: true
-  pdf_document:
-    toc: true
   html_document:
     toc: true
     toc_float: true
