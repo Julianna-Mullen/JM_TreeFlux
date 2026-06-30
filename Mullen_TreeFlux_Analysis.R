@@ -363,7 +363,7 @@ ggplot(my_data, aes(x = soil_temp_daily_mean,
  labs(
      x = "Daily Mean Soil Temperature (°C)",
      y = "CH₄ Flux" )
-
+# _______________________________________________
 ## CO2 Tree Flux x Soil Temp (colored by species)
 ggplot(my_data,aes(x = soil_temp_daily_mean,
                    y = CO2_lin_flux.estimate,
@@ -396,14 +396,6 @@ ggplot(my_data, aes(x = soil_temp_daily_mean,
      geom_smooth(method = "lm", se = FALSE) +
      facet_wrap(~ Species) +
      labs(title = "Soil Temperature × Treatment Effects on CH4 Flux")
-     
-## Methane and Soil Temp Over Time (alt)
- ggplot(my_data, aes(x = soil_temp_daily_mean, y = CH4_lin_flux.estimate)) +
-    geom_point(aes(color = Plot), alpha = 0.5) +
-        geom_smooth(method = "lm", se = FALSE) +
-      facet_wrap(~ Species) +
-     geom_vline(data = flood_date,
- aes(xintercept = NA), linetype = "dashed")  # placeholder style
 
  ## Methane vs Soil Temp (by plot)
 ggplot(my_data, aes(x = soil_temp_daily_mean, y = CH4_lin_flux.estimate)) +
@@ -414,3 +406,20 @@ ggplot(my_data, aes(x = soil_temp_daily_mean, y = CH4_lin_flux.estimate)) +
           title = "CH4 Flux vs Soil Temperature",
 x = "Soil Temperature (°C)",
  y = "CH4 Flux"     )
+
+## Nonlinear Temperature Response of CH4 (What is the actual shape of the temperature–methane relationship?)
+### Locally Estimated Scatterplot Smoothing = LOESS
+ggplot(my_data, aes(soil_temp_daily_mean, CH4_lin_flux.estimate)) +
+  geom_point(alpha = 0.4, aes(color = Species)) +
+  geom_smooth(method = "loess", se = FALSE) +
+  facet_wrap(~ Plot) +
+  labs(title = "Nonlinear Temperature Response of CH4")
+
+## Species Differences in Temperature Sensitivity (Do different species have different average rates of response to temperature?)
+ggplot(my_data, aes(soil_temp_daily_mean,
+                    CH4_lin_flux.estimate,
+                    color = Species)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Species Differences in Temperature Sensitivity")
+# _______________________________________________
