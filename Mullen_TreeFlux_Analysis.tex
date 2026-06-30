@@ -216,25 +216,6 @@ T3 & 2024-06-11 & 2024-06-13 \\
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## # A tibble: 3,156,480 x 12
-##    Site  Plot  TIMESTAMP           Instrument Instrument_ID Sensor_ID Location
-##    <chr> <chr> <dttm>              <chr>      <chr>         <chr>     <chr>   
-##  1 TMP   C     2020-01-01 00:00:00 TEROS12    12            T108      C6      
-##  2 TMP   C     2020-01-01 00:00:00 TEROS12    12            T131      H6      
-##  3 TMP   C     2020-01-01 00:00:00 TEROS12    11            T138      C3      
-##  4 TMP   C     2020-01-01 00:00:00 TEROS12    13            T174      H3      
-##  5 TMP   C     2020-01-01 00:00:00 TEROS12    13            T177      F4      
-##  6 TMP   C     2020-01-01 00:15:00 TEROS12    12            T108      C6      
-##  7 TMP   C     2020-01-01 00:15:00 TEROS12    12            T131      H6      
-##  8 TMP   C     2020-01-01 00:15:00 TEROS12    11            T138      C3      
-##  9 TMP   C     2020-01-01 00:15:00 TEROS12    13            T174      H3      
-## 10 TMP   C     2020-01-01 00:15:00 TEROS12    13            T177      F4      
-## # i 3,156,470 more rows
-## # i 5 more variables: research_name <chr>, Value <dbl>, N_avg <int>,
-## #   N_drop <int>, Value_MAC <dbl>
-\end{verbatim}
-
 \subsection{Take daily avg}\label{take-daily-avg}
 
 \begin{Shaded}
@@ -243,7 +224,7 @@ T3 & 2024-06-11 & 2024-06-13 \\
                                    \AttributeTok{path =} \StringTok{"Sensor\_Data/"}\NormalTok{, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
 \NormalTok{soil\_temp\_daily }\OtherTok{\textless{}{-}}\NormalTok{ soil\_temp\_data }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{mutate}\NormalTok{(}
-    \AttributeTok{TIMESTAMP =} \FunctionTok{as.POSIXct}\NormalTok{(TIMESTAMP),}
+\CommentTok{\#    TIMESTAMP = as.POSIXct(TIMESTAMP),}
     \AttributeTok{Date =} \FunctionTok{as.Date}\NormalTok{(TIMESTAMP),}
     \AttributeTok{Value =} \FunctionTok{as.numeric}\NormalTok{(Value) ) }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(Value)) }\SpecialCharTok{\%\textgreater{}\%}  
@@ -251,6 +232,7 @@ T3 & 2024-06-11 & 2024-06-13 \\
   \FunctionTok{summarise}\NormalTok{(}
     \AttributeTok{soil\_temp\_daily\_mean =} \FunctionTok{mean}\NormalTok{(Value),}
     \AttributeTok{n =} \FunctionTok{n}\NormalTok{(),}
+    \CommentTok{\# }\AlertTok{TODO}\CommentTok{: explain this next step (what\textquotesingle{}s 480?)}
     \AttributeTok{coverage =}\NormalTok{ n }\SpecialCharTok{/} \DecValTok{480}\NormalTok{,      }
     \AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{  )}
 \FunctionTok{print}\NormalTok{(soil\_temp\_daily)}
@@ -288,7 +270,9 @@ time)}\label{graphs-of-soil-temp-data-daily-averages-over-time}
 \end{Shaded}
 
 \pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-3-1.pdf}}
-\#\# Matching the plot names from tree flux and soil temp
+
+\subsection{Matching the plot names from tree flux and soil
+temp}\label{matching-the-plot-names-from-tree-flux-and-soil-temp}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -317,15 +301,29 @@ time)}\label{graphs-of-soil-temp-data-daily-averages-over-time}
 print(my\_data) \# BBL: print summary of fluxes? A table with mean, min,
 max and date ranges
 
-my\_data \%\textgreater\% ggplot(aes( x = Year, y =
-CH4\_lin\_flux.estimate, color = Plot )) + geom\_point(alpha = 0.6) +
-facet\_wrap(\textasciitilde{} Species) + labs( title = ``CH4 Flux by
-Species (2021--2025)'' )
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ my\_data }\SpecialCharTok{\%\textgreater{}\%}
+   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{( }\AttributeTok{x =}\NormalTok{ Year, }\AttributeTok{y =}\NormalTok{ CH4\_lin\_flux.estimate, }\AttributeTok{color =}\NormalTok{ Plot )) }\SpecialCharTok{+}
+   \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.6}\NormalTok{) }\SpecialCharTok{+}
+   \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Species) }\SpecialCharTok{+}
+   \FunctionTok{labs}\NormalTok{( }\AttributeTok{title =} \StringTok{"CH4 Flux by Species (2021–2025)"}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
 
-my\_data \%\textgreater\% ggplot(aes( x = Year, y =
-CO2\_lin\_flux.estimate, color = Plot )) + geom\_point(alpha = 0.6) +
-facet\_wrap(\textasciitilde{} Species) + labs( title = ``CO2 Flux by
-Species (2021--2025)'', y = ``CO2 Flux'' )
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-6-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{my\_data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{( }\AttributeTok{x =}\NormalTok{ Year, }\AttributeTok{y =}\NormalTok{ CO2\_lin\_flux.estimate, }\AttributeTok{color =}\NormalTok{ Plot )) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.6}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Species) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{( }\AttributeTok{title =} \StringTok{"CO2 Flux by Species (2021–2025)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"CO2 Flux"}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-6-2.pdf}}
 
 \section{Numerical summaries}\label{numerical-summaries-1}
 
@@ -433,7 +431,7 @@ Data}\label{spaghetti-plots-of-raw-data}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-6-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-7-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -450,7 +448,7 @@ Data}\label{spaghetti-plots-of-raw-data}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-6-2.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-7-2.pdf}}
 
 \subsection{Heat Maps of of Raw Data}\label{heat-maps-of-of-raw-data}
 
@@ -469,7 +467,7 @@ Data}\label{spaghetti-plots-of-raw-data}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-7-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-8-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -487,7 +485,7 @@ Data}\label{spaghetti-plots-of-raw-data}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-7-2.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-8-2.pdf}}
 
 \subsection{Relationship Between CH₄ and CO₂ Flux by
 Species}\label{relationship-between-chux2084-and-coux2082-flux-by-species}
@@ -507,7 +505,7 @@ Species}\label{relationship-between-chux2084-and-coux2082-flux-by-species}
 ## `geom_smooth()` using formula = 'y ~ x'
 \end{verbatim}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-8-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-9-1.pdf}}
 
 \subsection{Quarterly Flux for both GHG (raw
 data)}\label{quarterly-flux-for-both-ghg-raw-data}
@@ -528,7 +526,7 @@ data)}\label{quarterly-flux-for-both-ghg-raw-data}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-9-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-10-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -547,7 +545,7 @@ data)}\label{quarterly-flux-for-both-ghg-raw-data}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-9-2.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-10-2.pdf}}
 
 \section{Creation of Quarters}\label{creation-of-quarters}
 
@@ -656,7 +654,7 @@ emphasized}\label{quarterly-methane-flux-with-flood-averages-emphasized}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-13-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-14-1.pdf}}
 
 \section{Isolating Red Maple Trees (finding outlier
 (S7))}\label{isolating-red-maple-trees-finding-outlier-s7}
@@ -672,7 +670,7 @@ emphasized}\label{quarterly-methane-flux-with-flood-averages-emphasized}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-14-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-15-1.pdf}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -684,7 +682,7 @@ emphasized}\label{quarterly-methane-flux-with-flood-averages-emphasized}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-14-2.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-15-2.pdf}}
 
 \section{Separate S7 from all other
 trees}\label{separate-s7-from-all-other-trees}
@@ -752,7 +750,7 @@ trees}\label{separate-s7-from-all-other-trees}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-16-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-17-1.pdf}}
 
 \#S7 only
 
@@ -775,7 +773,7 @@ trees}\label{separate-s7-from-all-other-trees}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-17-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-18-1.pdf}}
 
 \#S7 Excluded from CH4 Flux
 
@@ -802,6 +800,216 @@ trees}\label{separate-s7-from-all-other-trees}
 \end{Highlighting}
 \end{Shaded}
 
-\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-18-1.pdf}}
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-19-1.pdf}}
+
+\section{Visualizing Soil Temp Data x GHG Tree
+Flux}\label{visualizing-soil-temp-data-x-ghg-tree-flux}
+
+\subsection{GHG Tree Flux x Soil Temp (colored by
+species)}\label{ghg-tree-flux-x-soil-temp-colored-by-species}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(my\_data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ soil\_temp\_daily\_mean,}
+             \AttributeTok{y =}\NormalTok{ CH4\_lin\_flux.estimate,}
+             \AttributeTok{color =}\NormalTok{ Species)) }\SpecialCharTok{+}
+ \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+ \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+ \FunctionTok{labs}\NormalTok{(}
+     \AttributeTok{x =} \StringTok{"Daily Mean Soil Temperature (°C)"}\NormalTok{,}
+     \AttributeTok{y =} \StringTok{"CH₄ Flux"}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-20-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(my\_data,}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ soil\_temp\_daily\_mean,}
+                   \AttributeTok{y =}\NormalTok{ CO2\_lin\_flux.estimate,}
+                   \AttributeTok{color =}\NormalTok{ Species)) }\SpecialCharTok{+}
+\FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-20-2.pdf}}
+
+\subsection{CH4 Tree Flux x Soil Temp (colored by
+species)}\label{ch4-tree-flux-x-soil-temp-colored-by-species}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(my\_data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ soil\_temp\_daily\_mean,}
+             \AttributeTok{y =}\NormalTok{ CH4\_lin\_flux.estimate,}
+             \AttributeTok{color =}\NormalTok{ Species)) }\SpecialCharTok{+}
+ \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+ \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+ \FunctionTok{labs}\NormalTok{(}
+     \AttributeTok{x =} \StringTok{"Daily Mean Soil Temperature (°C)"}\NormalTok{,}
+     \AttributeTok{y =} \StringTok{"CH₄ Flux"}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-21-1.pdf}}
+
+\subsection{CO2 Tree Flux x Soil Temp (colored by
+species)}\label{co2-tree-flux-x-soil-temp-colored-by-species}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(my\_data,}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ soil\_temp\_daily\_mean,}
+                   \AttributeTok{y =}\NormalTok{ CO2\_lin\_flux.estimate,}
+                   \AttributeTok{color =}\NormalTok{ Species)) }\SpecialCharTok{+}
+\FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-22-1.pdf}}
+
+\subsection{Methane and Soil Temp Over
+Time}\label{methane-and-soil-temp-over-time}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(my\_data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Date)) }\SpecialCharTok{+}
+ \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ CH4\_lin\_flux.estimate, }\AttributeTok{color =} \StringTok{"CH4"}\NormalTok{), }\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+\FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ soil\_temp\_daily\_mean, }\AttributeTok{color =} \StringTok{"Soil Temp"}\NormalTok{), }\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+ \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Species) }\SpecialCharTok{+}
+ \FunctionTok{scale\_color\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"CH4"} \OtherTok{=} \StringTok{"darkgreen"}\NormalTok{, }\StringTok{"Soil Temp"} \OtherTok{=} \StringTok{"red"}\NormalTok{)) }\SpecialCharTok{+}
+\FunctionTok{labs}\NormalTok{( }\AttributeTok{title =} \StringTok{"CH4 Flux and Soil Temperature Over Time"}\NormalTok{,}
+     \AttributeTok{y =} \StringTok{"Value (different scales)"}\NormalTok{,}
+   \AttributeTok{color =} \StringTok{"Variable"}\NormalTok{    )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-23-1.pdf}}
+
+\subsection{Methane vs Soil Temp (by
+plot)}\label{methane-vs-soil-temp-by-plot}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(my\_data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ soil\_temp\_daily\_mean, }\AttributeTok{y =}\NormalTok{ CH4\_lin\_flux.estimate)) }\SpecialCharTok{+}
+   \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{color =}\NormalTok{ Plot), }\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+       \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+     \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Species) }\SpecialCharTok{+}
+    \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{data =}\NormalTok{ flood\_date,}
+\FunctionTok{aes}\NormalTok{(}\AttributeTok{xintercept =} \ConstantTok{NA}\NormalTok{), }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{)  }\CommentTok{\# placeholder style}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 9 rows containing missing values or values outside the scale range
+## (`geom_vline()`).
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-24-1.pdf}}
+
+\subsection{Soil Temperature × Treatment Effects on CH4
+Flux}\label{soil-temperature-treatment-effects-on-ch4-flux}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(my\_data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ soil\_temp\_daily\_mean,}
+                  \AttributeTok{y =}\NormalTok{ CH4\_lin\_flux.estimate,}
+                     \AttributeTok{color =}\NormalTok{ Plot)) }\SpecialCharTok{+}
+     \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.4}\NormalTok{) }\SpecialCharTok{+}
+     \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+     \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Species) }\SpecialCharTok{+}
+     \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Soil Temperature × Treatment Effects on CH4 Flux"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-25-1.pdf}}
+
+\subsection{Methane vs Soil Temp (by
+plot)}\label{methane-vs-soil-temp-by-plot-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(my\_data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ soil\_temp\_daily\_mean, }\AttributeTok{y =}\NormalTok{ CH4\_lin\_flux.estimate)) }\SpecialCharTok{+}
+ \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{color =}\NormalTok{ Plot), }\AttributeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+      \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Species) }\SpecialCharTok{+}
+      \FunctionTok{labs}\NormalTok{(}
+          \AttributeTok{title =} \StringTok{"CH4 Flux vs Soil Temperature"}\NormalTok{,}
+\AttributeTok{x =} \StringTok{"Soil Temperature (°C)"}\NormalTok{,}
+ \AttributeTok{y =} \StringTok{"CH4 Flux"}\NormalTok{     )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-26-1.pdf}}
+
+\subsection{Nonlinear Temperature Response of CH4 (What is the actual
+shape of the temperature--methane
+relationship?)}\label{nonlinear-temperature-response-of-ch4-what-is-the-actual-shape-of-the-temperaturemethane-relationship}
+
+\subsubsection{Locally Estimated Scatterplot Smoothing =
+LOESS}\label{locally-estimated-scatterplot-smoothing-loess}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(my\_data, }\FunctionTok{aes}\NormalTok{(soil\_temp\_daily\_mean, CH4\_lin\_flux.estimate)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.4}\NormalTok{, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{color =}\NormalTok{ Species)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"loess"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Plot) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Nonlinear Temperature Response of CH4"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-27-1.pdf}}
+
+\subsection{Species Differences in Temperature Sensitivity (Do different
+species have different average rates of response to
+temperature?)}\label{species-differences-in-temperature-sensitivity-do-different-species-have-different-average-rates-of-response-to-temperature}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(my\_data, }\FunctionTok{aes}\NormalTok{(soil\_temp\_daily\_mean,}
+\NormalTok{                    CH4\_lin\_flux.estimate,}
+                    \AttributeTok{color =}\NormalTok{ Species)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.4}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Species Differences in Temperature Sensitivity"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Mullen_TreeFlux_Analysis_files/Mullen_TreeFlux_Analysis_files/figure-latex/unnamed-chunk-28-1.pdf}}
 
 \end{document}
