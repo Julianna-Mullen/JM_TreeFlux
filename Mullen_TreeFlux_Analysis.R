@@ -63,6 +63,20 @@ labs( title = "Daily Mean Soil Temperature by Plot",
    x = "Date",
    y = "Soil Temperature (°C)" ) 
 
+## Matching the plot names from tree flux and soil temp
+soil_temp_daily <- soil_temp_daily %>%
+  mutate( Plot = recode(Plot,
+         "C" = "Control",
+         "F" = "Freshwater",
+         "S" = "Seawater" )  )
+
+## Joining datasets
+my_data <- my_data %>%
+  left_join(
+     soil_temp_daily %>%
+    select(Plot, Date, soil_temp_daily_mean),
+    by = c("Plot", "Date"))
+
 # Numerical summaries -----
 
 print(my_data)
@@ -339,3 +353,64 @@ ggplot() +  geom_line(
        shape = "Flood event" ) +
   scale_shape_manual(values = c(T1 = 17, T2 = 17, T3 = 17)) +
   theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+## CH4 Tree Flux x Soil Temp (colored by species)
+ggplot(my_data, aes(x = soil_temp_daily_mean,
+             y = CH4_lin_flux.estimate,
+             color = Species)) +
+ geom_point(alpha = 0.5) +
+ geom_smooth(method = "lm", se = FALSE) +
+ labs(
+     x = "Daily Mean Soil Temperature (°C)",
+     y = "CH₄ Flux" )
+
+## CO2 Tree Flux x Soil Temp (colored by species)
+ggplot(my_data,aes(x = soil_temp_daily_mean,
+                   y = CO2_lin_flux.estimate,
+                   color = Species)) +
+geom_point(alpha = 0.5) + geom_smooth(method = "lm", se = FALSE)
+
+## Methane and Soil Temp Over Time 
+ggplot(my_data, aes(x = Date)) +
+ geom_line(aes(y = CH4_lin_flux.estimate, color = "CH4"), alpha = 0.5) +
+geom_line(aes(y = soil_temp_daily_mean, color = "Soil Temp"), alpha = 0.7) +
+ facet_wrap(~ Species) +
+ scale_color_manual(values = c("CH4" = "darkgreen", "Soil Temp" = "red")) +
+labs( title = "CH4 Flux and Soil Temperature Over Time",
+     y = "Value (different scales)",
+   color = "Variable"    )
+   
+## Methane vs Soil Temp (by plot)
+ggplot(my_data, aes(x = soil_temp_daily_mean, y = CH4_lin_flux.estimate)) +
+   geom_point(aes(color = Plot), alpha = 0.5) +
+       geom_smooth(method = "lm", se = FALSE) +
+     facet_wrap(~ Species) +
+    geom_vline(data = flood_date,
+aes(xintercept = NA), linetype = "dashed")  # placeholder style
+
+## Soil Temperature × Treatment Effects on CH4 Flux
+ggplot(my_data, aes(x = soil_temp_daily_mean,
+                  y = CH4_lin_flux.estimate,
+                     color = Plot)) +
+     geom_point(alpha = 0.4) +
+     geom_smooth(method = "lm", se = FALSE) +
+     facet_wrap(~ Species) +
+     labs(title = "Soil Temperature × Treatment Effects on CH4 Flux")
+     
+## Methane and Soil Temp Over Time (alt)
+ ggplot(my_data, aes(x = soil_temp_daily_mean, y = CH4_lin_flux.estimate)) +
+    geom_point(aes(color = Plot), alpha = 0.5) +
+        geom_smooth(method = "lm", se = FALSE) +
+      facet_wrap(~ Species) +
+     geom_vline(data = flood_date,
+ aes(xintercept = NA), linetype = "dashed")  # placeholder style
+
+ ## Methane vs Soil Temp (by plot)
+ggplot(my_data, aes(x = soil_temp_daily_mean, y = CH4_lin_flux.estimate)) +
+ geom_point(aes(color = Plot), alpha = 0.5) +
+      geom_smooth(method = "lm", se = FALSE, color = "black") +
+      facet_wrap(~ Species) +
+      labs(
+          title = "CH4 Flux vs Soil Temperature",
+x = "Soil Temperature (°C)",
+ y = "CH4 Flux"     )
