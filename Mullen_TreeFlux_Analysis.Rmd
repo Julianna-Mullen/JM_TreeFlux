@@ -24,6 +24,8 @@ library(dplyr)
 library(lubridate)
 library(compasstools)
 library(arrow)
+library(broom)
+library(patchwork)
 ```
 
 # TEMPEST flood dates
@@ -589,5 +591,385 @@ ggplot(my_data, aes(soil_temp_daily_mean,
   geom_point(alpha = 0.4) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "Species Differences in Temperature Sensitivity")
+```
+
+## Relationship between Soil Temp and Methane Flux
+```{r}
+ ggplot(my_data,
+    aes(x = soil_temp_daily_mean,
+            y = CH4_lin_flux.estimate,
+            color = Species)) +
+     geom_point(alpha = 0.35) +
+     geom_smooth(method = "loess", se = TRUE) +
+     labs(
+         x = "Daily Mean Soil Temperature (°C)",
+         y = "CH4 Flux",
+         title = "Relationship Between Soil Temperature and CH₄ Flux" ) 
+```
+
+## Relationship between Soil Temp and CO2 Flux
+```{r}
+ggplot(my_data,
+       aes(x = soil_temp_daily_mean,
+            y = CO2_lin_flux.estimate,
+            color = Plot)) +
+     geom_point(alpha = 0.4) +
+     geom_smooth(method = "loess", se = FALSE) +
+     facet_wrap(~Species) +
+     labs(
+         title = "Relationship Between Daily Mean Soil Temperature and CO₂ Flux",
+         x = "Daily Mean Soil Temperature (°C)",
+         y = expression(CO[2]~"Flux"),
+         color = "Treatment")
+```
+
+
+## Facet by species, color by plot
+```{r}
+ggplot(my_data,
+ aes(x = soil_temp_daily_mean,
+       y = CH4_lin_flux.estimate,
+            color = Plot)) +
+     geom_point(alpha = 0.35) +
+     geom_smooth(method = "loess", se = FALSE) +
+     facet_wrap(~Species)
+```
+
+## Facet by Plot, color by Species
+```{r}
+ggplot(my_data,
+  aes(x = soil_temp_daily_mean,
+            y = CH4_lin_flux.estimate,
+            color = Species)) +
+     geom_point(alpha = 0.35) +
+     geom_smooth(method = "loess", se = FALSE) +
+     facet_wrap(~Plot)
+```
+
+## Seasonal and Flood-Driven Dynamics of Soil Temperature and Greenhouse Gas Fluxes (CH4 and CO2)
+```{r}
+
+# CO2 quarterly summary
+quarterly_CO2 <- my_data %>%
+  group_by(YearQuarter, Plot, Species) %>%
+  summarize(
+    mean_flux = mean(CO2_lin_flux.estimate, na.rm = TRUE),
+    se = sd(CO2_lin_flux.estimate, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop" )
+
+# Soil quarterly summary
+quarterly_soil <- my_data %>%
+  group_by(YearQuarter, Plot, Species) %>%
+  summarize(
+    mean_soil = mean(soil_temp_daily_mean, na.rm = TRUE),
+    .groups = "drop")
+
+# Create flood dataset for soil temperature
+# -------------------------
+flood_soil <- quarterly_soil %>%
+  inner_join(
+    flood_date %>%
+      mutate(YearQuarter = year(Start) + (quarter(Start) - 1) / 4),
+    by = "YearQuarter"
+  ) %>%
+  select(YearQuarter, Plot, Species, mean_soil, Event)
+
+# CH4 plot
+p1 <- ggplot(quarterly_CH4,
+             aes(x = YearQuarter,
+                 y = mean_flux,
+                 color = Plot,
+                 group = Plot)) +
+  geom_line() +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = mean_flux - se,
+                    ymax = mean_flux + se),
+                width = 0.05) +
+  geom_point(data = flood_CH4,
+             aes(x = YearQuarter,
+                 y = mean_flux,
+                 shape = Event),
+             color = "black",
+             size = 1.5,
+             inherit.aes = FALSE) +
+  facet_wrap(~Species) +
+  labs(y = "CH₄ Flux",
+       x = NULL,
+       shape = "Flood event") 
+
+# CO2 plot
+p2 <- ggplot(quarterly_CO2,
+             aes(x = YearQuarter,
+                 y = mean_flux,
+                 color = Plot,
+                 group = Plot)) +
+  geom_line() +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = mean_flux - se,
+                    ymax = mean_flux + se),
+                width = 0.05) +
+  geom_point(data = flood_CH4,
+             aes(x = YearQuarter,
+                 y = mean_flux,
+                 shape = Event),
+             color = "black",
+             size = 1.5,
+             inherit.aes = FALSE) +
+  facet_wrap(~Species) +
+  labs(y = "CO₂ Flux",
+       x = NULL,
+       shape = "Flood event") 
+
+# Soil temperature plot
+p3 <- ggplot(quarterly_soil,
+             aes(x = YearQuarter,
+                 y = mean_soil,
+                 color = Plot,
+                 group = Plot)) +
+  geom_line(linewidth = 1) +
+  geom_point(data = flood_soil,
+             aes(x = YearQuarter,
+                 y = mean_soil,
+                 shape = Event),
+             color = "black",
+             size = 1.5,
+             inherit.aes = FALSE) +
+  facet_wrap(~Species) +
+  labs(y = "Soil Temperature (°C)",
+       x = "Year-Quarter",
+       shape = "Flood event") 
+
+# Combine all plots
+p1 / p2 / p3 +
+  plot_layout(ncol = 1, guides = "collect") &
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+# All Trees GHG Relationship
+```{r}
+ggplot(my_data,
+     aes(x = soil_temp_daily_mean,
+            y = CH4_lin_flux.estimate)) +
+     geom_point(alpha = 0.4) +
+     geom_smooth(method = "loess", se = FALSE, color = "blue") +
+     facet_wrap(~ID, scales = "free") +
+     labs(
+         title = "Methane Flux vs Soil Temperature by Tree",
+         x = "Daily Mean Soil Temperature (°C)",
+         y = "CH4 Flux") 
+```
+
+```{r}
+ggplot(my_data,
+       aes(x = soil_temp_daily_mean,
+            y = CO2_lin_flux.estimate)) +
+     geom_point(alpha = 0.4) +
+     geom_smooth(method = "loess", se = FALSE, color = "blue") +
+     facet_wrap(~ID, scales = "free") +
+     labs(
+         title = "Carbon Dioxide Flux vs Soil Temperature by Tree",
+         x = "Daily Mean Soil Temperature (°C)",
+         y = "CO2 Flux")
+```
+
+# Methane x Soil by Plot
+
+## Methane Flux vs. Daily Mean Soil Temperature (Control Trees)
+```{r}
+control_data <- my_data %>%
+   filter(Plot == "Control")
+ 
+ ggplot(control_data,
+        aes(x = soil_temp_daily_mean,
+            y = CH4_lin_flux.estimate)) +
+     geom_point(alpha = 0.4) +
+     geom_smooth(method = "loess", se = FALSE, color = "green") +
+     facet_wrap(~ID, scales = "free") +
+     labs(
+         title = "Methane Flux vs. Daily Mean Soil Temperature (Control Trees)",
+         x = "Daily Mean Soil Temperature (°C)",
+         y = "CH4 Flux")
+```
+
+## Methane Flux vs. Daily Mean Soil Temperature (Freshwater Trees)
+```{r}
+Freshwater_data <- my_data %>%
+     filter(Plot == "Freshwater")
+ ggplot(Freshwater_data,
+        aes(x = soil_temp_daily_mean,
+            y = CH4_lin_flux.estimate)) +
+     geom_point(alpha = 0.4) +
+     geom_smooth(method = "loess", se = FALSE, color = "blue") +
+     facet_wrap(~ID, scales = "free") +
+     labs(
+         title = "Methane Flux vs. Daily Mean Soil Temperature (Freshwater Trees)",
+         x = "Daily Mean Soil Temperature (°C)",
+         y = "CH4 Flux")
+```
+
+## Methane Flux vs. Daily Mean Soil Temperature (Seawater Trees)
+```{r}
+Seawater_data <- my_data %>%
+    filter(Plot == "Seawater")
+ ggplot(Seawater_data,
+        aes(x = soil_temp_daily_mean,
+            y = CH4_lin_flux.estimate)) +
+     geom_point(alpha = 0.4) +
+     geom_smooth(method = "loess", se = FALSE, color = "red") +
+     facet_wrap(~ID, scales = "free") +
+     labs(
+         title = "Methane Flux vs. Daily Mean Soil Temperature (Seawater Trees)",
+         x = "Daily Mean Soil Temperature (°C)",
+         y = "CH4 Flux")
+```
+
+# Carbon Dioxide x Soil by Plot
+
+## CO2 Flux vs. Daily Mean Soil Temperature (Control Trees)
+```{r}
+control_data <- my_data %>%
+    filter(Plot == "Control")
+ggplot(control_data,
+       aes(x = soil_temp_daily_mean,
+           y = CO2_lin_flux.estimate)) +
+    geom_point(alpha = 0.4) +
+    geom_smooth(method = "loess", se = FALSE, color = "green") +
+    facet_wrap(~ID, scales = "free") +
+    labs(
+        title = "CO2 Flux vs. Daily Mean Soil Temperature (Control Trees)",
+        x = "Daily Mean Soil Temperature (°C)",
+        y = "CO2 Flux")
+```
+
+## CO2 Flux vs. Daily Mean Soil Temperature (Freshwater Trees)
+```{r}
+Freshwater_data <- my_data %>%
+    filter(Plot == "Freshwater")
+ggplot(Freshwater_data,
+       aes(x = soil_temp_daily_mean,
+           y = CO2_lin_flux.estimate)) +
+    geom_point(alpha = 0.4) +
+    geom_smooth(method = "loess", se = FALSE, color = "blue") +
+    facet_wrap(~ID, scales = "free") +
+    labs(
+        title = "CO2 Flux vs. Daily Mean Soil Temperature (Freshwater Trees)",
+        x = "Daily Mean Soil Temperature (°C)",
+        y = "CO2 Flux")
+```
+
+## CO2 Flux vs. Daily Mean Soil Temperature (Seawater Trees)
+```{r}
+Seawater_data <- my_data %>%
+    filter(Plot == "Seawater")
+ggplot(Seawater_data,
+       aes(x = soil_temp_daily_mean,
+           y = CO2_lin_flux.estimate)) +
+    geom_point(alpha = 0.4) +
+    geom_smooth(method = "loess", se = FALSE, color = "red") +
+    facet_wrap(~ID, scales = "free") +
+    labs(
+        title = "CO2 Flux vs. Daily Mean Soil Temperature (Seawater Trees)",
+        x = "Daily Mean Soil Temperature (°C)",
+        y = "CO2 Flux")
+```
+
+# Carbon Dioxide x Soil by Plot
+
+## CO2 Flux vs. Soil Temperature (Red Maple Trees)
+```{r}
+ red_maple_data <- my_data %>%
+  filter(Species == "Red Maple")
+ ggplot(red_maple_data,
+        aes(x = soil_temp_daily_mean,
+            y = CO2_lin_flux.estimate)) +
+     geom_point(alpha = 0.4) +
+     geom_smooth(method = "loess", se = FALSE, color = "red") +
+     facet_wrap(~ID, scales = "free") +
+     labs(
+         title = "CO2 Flux vs Soil Temperature (Red Maple Trees)",
+       x = "Soil Temperature (°C)",
+         y = "CO2 Flux")
+```
+
+## CO2 Flux vs. Soil Temperature (Beech Trees)
+```{r}
+beech_data <- my_data %>%
+    filter(Species == "Beech")
+ ggplot(beech_data,
+        aes(x = soil_temp_daily_mean,
+            y = CO2_lin_flux.estimate)) +
+     geom_point(alpha = 0.4) +
+     geom_smooth(method = "loess", se = FALSE, color = "green") +
+     facet_wrap(~ID, scales = "free") +
+     labs(
+         title = "CO2 Flux vs Soil Temperature (Beech Trees)",
+         x = "Soil Temperature (°C)",
+         y = "CO2 Flux")
+```
+
+## CO2 Flux vs. Soil Temperature (Tulip Poplar Trees)
+```{r}
+tulip_poplar_data <- my_data %>%
+    filter(Species == "Tulip Poplar")
+ ggplot(tulip_poplar_data,
+        aes(x = soil_temp_daily_mean,
+            y = CO2_lin_flux.estimate)) +
+     geom_point(alpha = 0.4) +
+     geom_smooth(method = "loess", se = FALSE, color = "blue") +
+     facet_wrap(~ID, scales = "free") +
+     labs(
+         title = "CO2 Flux vs Soil Temperature (Tulip Poplar Trees)",
+         x = "Soil Temperature (°C)",
+         y = "CO2 Flux")
+```
+
+# Methane x Soil by Plot
+
+## CH4 Flux vs. Soil Temperature (Red Maple Trees)
+```{r}
+red_maple_data <- my_data %>%
+    filter(Species == "Red Maple")
+ggplot(red_maple_data,
+       aes(x = soil_temp_daily_mean,
+           y = CH4_lin_flux.estimate)) +
+    geom_point(alpha = 0.4) +
+    geom_smooth(method = "loess", se = FALSE, color = "red") +
+    facet_wrap(~ID, scales = "free") +
+    labs(
+        title = "Methane Flux vs Soil Temperature (Red Maple Trees)",
+        x = "Soil Temperature (°C)",
+        y = "CH4 Flux")
+```
+
+## CH4 Flux vs. Soil Temperature (Beech Trees)
+```{r}
+beech_data <- my_data %>%
+    filter(Species == "Beech")
+ggplot(beech_data,
+       aes(x = soil_temp_daily_mean,
+           y = CH4_lin_flux.estimate)) +
+    geom_point(alpha = 0.4) +
+    geom_smooth(method = "loess", se = FALSE, color = "green") +
+    facet_wrap(~ID, scales = "free") +
+    labs(
+        title = "Methane Flux vs Soil Temperature (Beech Trees)",
+        x = "Soil Temperature (°C)",
+        y = "CH4 Flux")
+```
+
+## CH4 Flux vs. Soil Temperature (Tulip Poplar Trees)
+```{r}
+tulip_poplar_data <- my_data %>%
+  filter(Species == "Tulip Poplar")
+ggplot(tulip_poplar_data,
+       aes(x = soil_temp_daily_mean,
+           y = CH4_lin_flux.estimate)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "loess", se = FALSE, color = "blue") +
+  facet_wrap(~ID, scales = "free") +
+  labs(
+    title = "CH₄ Flux vs Soil Temperature (Tulip Poplar Trees)",
+    x = "Soil Temperature (°C)",
+    y = "CH₄ Flux" )
 ```
 
