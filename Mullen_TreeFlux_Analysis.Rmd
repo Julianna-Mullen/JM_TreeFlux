@@ -1023,4 +1023,61 @@ ggplot(tulip_poplar_data,
     x = "Soil Temperature (°C)",
     y = "CH₄ Flux" )
 ```
+# Categorize trees' Temp sensitivity 
+
+```{r}
+ch4_sensitivity <- my_data %>%
+    ungroup() %>%
+     reframe(
+         lm(CH4_lin_flux.estimate ~ soil_temp_daily_mean) %>% tidy(),
+         .by = ID )
+ch4_sensitivity
+```
+```{r}
+ch4_sensitivity <- ch4_sensitivity %>%
+    filter(term == "soil_temp_daily_mean") %>%
+    mutate(
+        sensitivity = case_when(
+            p.value < 0.05 & estimate > 0 ~ "Positive",
+            p.value < 0.05 & estimate < 0 ~ "Negative",
+            TRUE ~ "Neutral"
+        ))
+ch4_sensitivity
+```
+
+ # Visualization of Temp Sensitivity
+```{r}
+ggplot(subset(ch4_sensitivity, sensitivity == "Positive"),
+       aes(x = reorder(ID, estimate),
+           y = estimate)) +
+  geom_col(fill = "darkgreen") +
+  coord_flip() +
+  labs(title = "Positive Temperature Sensitivity (CH4)",
+       x = "Tree ID",
+       y = "Slope")
+```
+ 
+```{r}
+ggplot(subset(ch4_sensitivity, sensitivity == "Neutral"),
+       aes(x = reorder(ID, estimate),
+           y = estimate)) +
+  geom_col(fill = "blue") +
+  coord_flip() +
+  labs(title = "Neutral Temperature Sensitivity (CH4)",
+       x = "Tree ID",
+       y = "Slope") 
+```
+
+## Checking for negatives 
+```{r}
+table(ch4_sensitivity$sensitivity)
+```
+
+```{r}
+negative_data <- ch4_sensitivity %>%
+    filter(sensitivity == "Negative")
+negative_data <- ch4_sensitivity %>%
+    filter(sensitivity == "Negative")
+negative_data
+```
 
