@@ -503,7 +503,7 @@ ggplot(my_data, aes(x = soil_temp_daily_mean,
  geom_smooth(method = "lm", se = FALSE) +
  labs(
      x = "Daily Mean Soil Temperature (°C)",
-     y = "CH₄ Flux" )
+     y = "CH4 Flux" )
 ```
 
 
@@ -637,7 +637,7 @@ ggplot(my_data, aes(soil_temp_daily_mean,
      labs(
          x = "Daily Mean Soil Temperature (°C)",
          y = "CH4 Flux",
-         title = "Relationship Between Soil Temperature and CH₄ Flux" ) 
+         title = "Relationship Between Soil Temperature and CH4 Flux" ) 
 ```
 
 ## Relationship between Soil Temp and CO2 Flux
@@ -650,7 +650,7 @@ ggplot(my_data,
      geom_smooth(method = "loess", se = FALSE) +
      facet_wrap(~Species) +
      labs(
-         title = "Relationship Between Daily Mean Soil Temperature and CO₂ Flux",
+         title = "Relationship Between Daily Mean Soil Temperature and CO2 Flux",
          x = "Daily Mean Soil Temperature (°C)",
          y = expression(CO[2]~"Flux"),
          color = "Treatment")
