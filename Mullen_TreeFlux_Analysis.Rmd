@@ -1075,11 +1075,23 @@ for(id in unique(my_data$ID)) {
   
   # Compute Q10 using the method we went over
   # JM TODO
-  
+  fit <- lm(log(CH4_lin_flux.estimate) ~ soil_temp_daily_mean, data = q10_data)
+
+x <- seq(min(q10_data$soil_temp_daily_mean),
+         max(q10_data$soil_temp_daily_mean),
+         length.out = 20)
+
+y_pred <- predict(fit, newdata = data.frame(soil_temp_daily_mean = x))
+
+q10 <- (y_pred[20] / y_pred[1]) ^ (10 / (x[20] - x[1]))
   # Save in our running list
   q10_results_list[[id]] <- q10
 }
 # Bind the list into a summary data frame
 q10_results <- bind_rows(q10_results_list, .id = "ID")
+```
+
+```{r}
+q10_results
 ```
 
