@@ -1073,8 +1073,7 @@ for(id in unique(my_data$ID)) {
 
   q10_data <- my_data |> filter(ID == id)
   
-  # Compute Q10 using the method we went over
-  # JM TODO
+# Compute Q10 using the method we went over
   fit <- lm(log(CH4_lin_flux.estimate) ~ soil_temp_daily_mean, data = q10_data)
 
 x <- seq(min(q10_data$soil_temp_daily_mean),
