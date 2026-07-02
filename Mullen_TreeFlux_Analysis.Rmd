@@ -1065,3 +1065,21 @@ negative_data <- ch4_sensitivity %>%
 negative_data
 ```
 
+# Compute Q10 (temperature sensitivity)
+
+```{r}
+q10_results_list <- list()
+for(id in unique(my_data$ID)) {
+
+  q10_data <- my_data |> filter(ID == id)
+  
+  # Compute Q10 using the method we went over
+  # JM TODO
+  
+  # Save in our running list
+  q10_results_list[[id]] <- q10
+}
+# Bind the list into a summary data frame
+q10_results <- bind_rows(q10_results_list, .id = "ID")
+```
+
