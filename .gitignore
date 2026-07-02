@@ -54,5 +54,7 @@ rsconnect/
 # Sensor Data
 Sensor_Data/
 
-# Rmarkdown output html files
+# Rmarkdown output files
 *.html
+*.docx
+*.tex
