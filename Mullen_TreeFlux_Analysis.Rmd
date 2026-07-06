@@ -126,15 +126,21 @@ print(my_data)
 
 # Initial visualizations  of Raw Data
 
-## Scatter Plot (CH4)
+## Boxplots
 ```{r}
  my_data %>%
-   ggplot(aes( x = Year, y = CH4_lin_flux.estimate, color = Plot )) +
-   geom_point(alpha = 0.6) +
-   facet_wrap(~ Species) +
-   labs( title = "CH4 Flux by Species (2021–2025)" )
+  ggplot(aes(x = factor(Year),
+             y = CH4_lin_flux.estimate,
+             fill = factor(Year))) +
+  geom_boxplot(alpha = 0.7) +
+  facet_grid(Species ~ .) +
+  labs( title = "CH4 Flux by Species (2021–2025)",
+    x = "Year",
+    y = "CH4 Flux",
+    fill = "Year") +
+  theme(legend.position = "none")
 ```
-## Boxplot (CO2)
+
 ```{r}
 my_data %>%
   ggplot(aes(x = factor(Year),
