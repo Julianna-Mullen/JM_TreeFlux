@@ -749,19 +749,23 @@ ggplot(my_data,
 ```{r}
 # Generate plot-specific graphs
 for(plot in unique(my_data$Plot)) {
-  plot_data <- my_data %>%
-    filter(Plot == plot)
   
-  ggplot(plot_data,
-         aes(x = soil_temp_daily_mean,
-             y = CH4_lin_flux.estimate)) +
+  plot_data <- my_data %>%
+    dplyr::filter(Plot == plot)
+  
+  p <- ggplot(plot_data,
+              aes(x = soil_temp_daily_mean,
+                  y = CH4_lin_flux.estimate)) +
     geom_point(alpha = 0.4) +
     geom_smooth(method = "loess", se = FALSE, color = "green") +
     facet_wrap(~ID, scales = "free") +
     labs(
       title = paste0("Methane Flux vs. Daily Mean Soil Temperature (", plot, " Trees)"),
-                     x = "Daily Mean Soil Temperature (°C)",
-                     y = "CH4 Flux")
+      x = "Daily Mean Soil Temperature (°C)",
+      y = "CH4 Flux"
+    )
+  
+  print(p)
 }
 ```
 
