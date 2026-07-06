@@ -237,6 +237,12 @@ quarterly_CH4 <- my_data %>%
   group_by(YearQuarter, Species, Plot, is_S7) %>%
   summarize(mean_flux = mean(CH4_lin_flux.estimate, na.rm = TRUE),
             se = sd(CH4_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
+
+quarterly_CO2 <- my_data %>%
+  mutate(is_S7 = ID == "S7") %>%
+  group_by(YearQuarter, Species, Plot, is_S7) %>%
+  summarize(mean_flux = mean(CO2_lin_flux.estimate, na.rm = TRUE),
+            se = sd(CO2_lin_flux.estimate, na.rm = TRUE) / sqrt(n()), .groups = "drop")
 ```
 
 # Flood-week averages for reference
