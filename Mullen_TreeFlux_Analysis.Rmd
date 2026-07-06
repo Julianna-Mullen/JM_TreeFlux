@@ -543,6 +543,7 @@ ggplot(my_data, aes(soil_temp_daily_mean, CH4_lin_flux.estimate)) +
 
 ## Locally Estimated Scatterplot Smoothing = LOESS
 
+
 # Nonlinear Temperature Response of CO2 
 ## What is the actual shape of the temperature–carbon dioxide relationship?
 ```{r}
@@ -572,6 +573,7 @@ ggplot(my_data, aes(soil_temp_daily_mean,
   labs(title = "Species Differences in Temperature Sensitivity (CO2)")
 ```
 
+# Relationship between daily mean soil temperature and GHF flux
 ## Facet by species, color by plot
 ```{r}
 ggplot(my_data,
@@ -600,9 +602,7 @@ ggplot(my_data,
      geom_point(alpha = 0.35) +
      geom_smooth(method = "loess", se = FALSE) +
      facet_wrap(~Plot)
-```
 
-```{r}
 ggplot(my_data,
   aes(x = soil_temp_daily_mean,
             y = CO2_lin_flux.estimate,
@@ -613,8 +613,8 @@ ggplot(my_data,
 ```
 
 # Seasonal and Flood-Driven Dynamics of Soil Temperature and GHG Fluxes
+## three-panel time series figure that tracks methane flux, carbon dioxide flux, and soil temperature over time, summarized by quarter.
 ```{r}
-
 # CO2 quarterly summary
 quarterly_CO2 <- my_data %>%
   group_by(YearQuarter, Plot, Species) %>%
