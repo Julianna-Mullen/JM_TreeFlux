@@ -1,6 +1,6 @@
 ---
 title: "Mullen TreeFlux Analysis"
-author: "JM"
+author: "Julianna Mullen"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -86,6 +86,7 @@ soil_temp_daily <- soil_temp_data %>%
     coverage = n / 96,      
     .groups = "drop"  )
 print(soil_temp_daily)
+# 96 is the number of recordings per day (24 hours/day × 60 minutes/hour = 1440 minutes/day, 1440 ÷ 15 = 96 measurements/day)
 ```
 ## Graphs of Soil Temp Data (Daily averages over time)
 ```{r}
@@ -288,6 +289,8 @@ ggplot(annual_means_CO2,aes( x = Year, y = mean_flux, color = Plot, group = Plot
         y = "Mean CO2 Flux" ) 
 ```
 
+# TODO: Quarterly Carbon Dioxide Flux with flood averages emphasized
+
 # Quarterly Methane Flux with flood averages emphasized
 ```{r}
 ggplot(quarterly_CH4,
@@ -320,7 +323,8 @@ ggplot(quarterly_CH4,
 
 ```
 
-# Isolating Red Maple Trees (finding outlier (S7))
+# Isolating Red Maple Trees (finding outlier (S7)) 
+## Taking a closer look at the Red Maple trees to identify why the flux averages are so high
 ```{r}
 my_data %>%
   filter(Species == "Red Maple") %>%
@@ -328,16 +332,17 @@ my_data %>%
   geom_line(alpha = 0.7) +
   facet_wrap(~ ID) +
   labs(title = "Red Maple CH4 Flux by Individual Tree")
-
+```
+## S7 is a big emitter, to the extent where it's fluxes throw off the dataset
+```{r}
 my_data %>%
   filter(Species == "Red Maple") %>%
   ggplot(aes(x = Date, y = CO2_lin_flux.estimate)) +
   geom_line(alpha = 0.7) +
   facet_wrap(~ ID) 
 ```
-## S7 is a big emitter, to teh extent where it's fluxes throw off the dataset
 
-# Separate S7 from all other trees (for Methane)
+# Separate S7 from all other trees in the dataset (for Methane)
 ```{r}
 s7_CH4 <- my_data %>%
   filter(ID == "S7") %>%
@@ -357,7 +362,6 @@ flood_S7_CH4 <- s7_CH4 %>%
   inner_join(flood_points, by = "YearQuarter")
 ```
 
-# Quarterly CH4 Flux (S7 excluded from means, shown separately)
 # S7 only 
 ```{r}
 ggplot(quarterly_CH4_S7, aes(x = YearQuarter, y = mean_flux)) +
@@ -376,6 +380,7 @@ ggplot(quarterly_CH4_S7, aes(x = YearQuarter, y = mean_flux)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
+# Quarterly CH4 Flux (S7 excluded from means, shown separately)
 ```{r}
 ggplot() +
   # OTHER TREES (baseline)
@@ -480,33 +485,8 @@ ggplot(my_data,aes(x = soil_temp_daily_mean,
   # use a polynomial to produce a curved line
   geom_smooth(method = "lm", formula = y ~ x + I(x^2), se = FALSE)
 ```
-
-# GHG and Soil Temp Over Time 
-```{r}
-ggplot(my_data, aes(x = Date)) +
- geom_line(aes(y = CH4_lin_flux.estimate, color = "CH4"), alpha = 0.5) +
-geom_line(aes(y = soil_temp_daily_mean, color = "Soil Temp"), alpha = 0.7) +
- facet_wrap(~ Species) +
- scale_color_manual(values = c("CH4" = "darkgreen", "Soil Temp" = "red")) +
-labs( title = "CH4 Flux and Soil Temperature Over Time",
-     y = "Value (different scales)",
-   color = "Variable"    )
-```
-
-```{r}
-ggplot(my_data, aes(x = Date)) +
- geom_line(aes(y = CO2_lin_flux.estimate, color = "C02"), alpha = 0.5) +
-geom_line(aes(y = soil_temp_daily_mean, color = "Soil Temp"), alpha = 0.7) +
- facet_wrap(~ Species) +
- scale_color_manual(values = c("CO2" = "darkgreen", "Soil Temp" = "red")) +
-labs( title = "CO2 Flux and Soil Temperature Over Time",
-     y = "Value (different scales)",
-   color = "Variable"    )
-```
-
    
 # GHG vs Soil Temp (by plot)
-
 ```{r}
 ggplot(my_data, aes(x = soil_temp_daily_mean, y = CH4_lin_flux.estimate)) +
    geom_point(aes(color = Plot), alpha = 0.5) +
@@ -556,6 +536,7 @@ ggplot(my_data, aes(soil_temp_daily_mean, CH4_lin_flux.estimate)) +
   facet_wrap(~ Plot) +
   labs(title = "Nonlinear Temperature Response of CH4")
 ```
+
 ## Locally Estimated Scatterplot Smoothing = LOESS
 
 # Nonlinear Temperature Response of CO2 
@@ -585,35 +566,6 @@ ggplot(my_data, aes(soil_temp_daily_mean,
   geom_point(alpha = 0.4) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "Species Differences in Temperature Sensitivity (CO2)")
-```
-
-# Relationship between Soil Temp and GHG Flux
-```{r}
- ggplot(my_data,
-    aes(x = soil_temp_daily_mean,
-            y = CH4_lin_flux.estimate,
-            color = Species)) +
-     geom_point(alpha = 0.35) +
-     geom_smooth(method = "loess", se = TRUE) +
-     labs(
-         x = "Daily Mean Soil Temperature (°C)",
-         y = "CH4 Flux",
-         title = "Relationship Between Soil Temperature and CH4 Flux" ) 
-```
-
-```{r}
-ggplot(my_data,
-       aes(x = soil_temp_daily_mean,
-            y = CO2_lin_flux.estimate,
-            color = Plot)) +
-     geom_point(alpha = 0.4) +
-     geom_smooth(method = "loess", se = FALSE) +
-     facet_wrap(~Species) +
-     labs(
-         title = "Relationship Between Daily Mean Soil Temperature and CO2 Flux",
-         x = "Daily Mean Soil Temperature (°C)",
-         y = expression(CO[2]~"Flux"),
-         color = "Treatment")
 ```
 
 ## Facet by species, color by plot
@@ -656,7 +608,7 @@ ggplot(my_data,
      facet_wrap(~Plot)
 ```
 
-# Seasonal and Flood-Driven Dynamics of Soil Temperature and Greenhouse Gas Fluxes (CH4 and CO2)
+# Seasonal and Flood-Driven Dynamics of Soil Temperature and GHG Fluxes
 ```{r}
 
 # CO2 quarterly summary
@@ -703,7 +655,7 @@ p1 <- ggplot(quarterly_CH4,
              size = 1.5,
              inherit.aes = FALSE) +
   facet_wrap(~Species) +
-  labs(y = "CH₄ Flux",
+  labs(y = "CH4 Flux",
        x = NULL,
        shape = "Flood event") 
 
@@ -718,7 +670,7 @@ p2 <- ggplot(quarterly_CO2,
   geom_errorbar(aes(ymin = mean_flux - se,
                     ymax = mean_flux + se),
                 width = 0.05) +
-  geom_point(data = flood_CH4,
+  geom_point(data = flood_CO2,
              aes(x = YearQuarter,
                  y = mean_flux,
                  shape = Event),
@@ -726,7 +678,7 @@ p2 <- ggplot(quarterly_CO2,
              size = 1.5,
              inherit.aes = FALSE) +
   facet_wrap(~Species) +
-  labs(y = "CO₂ Flux",
+  labs(y = "CO2 Flux",
        x = NULL,
        shape = "Flood event") 
 
@@ -755,7 +707,8 @@ p1 / p2 / p3 +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-# All Trees GHG Relationship
+# All Trees GHG Relationship 
+## So small its hard to identify patterns and isolate differences
 ```{r}
 ggplot(my_data,
      aes(x = soil_temp_daily_mean,
@@ -782,7 +735,7 @@ ggplot(my_data,
          y = "CO2 Flux")
 ```
 
-# Methane x Soil Temp. by Plot
+# Methane x Soil Temp. by Plot (!there is an error to fix here!)
 ```{r}
 # Generate plot-specific graphs
 for(plot in unique(my_data$Plot)) {
@@ -803,7 +756,7 @@ for(plot in unique(my_data$Plot)) {
 ```
 
 # Carbon Dioxide x Soil by Plot
-## CO2 Flux vs. Daily Mean Soil Temperature (Control Trees)
+## Control Trees
 ```{r}
 control_data <- my_data %>%
     filter(Plot == "Control")
@@ -819,7 +772,7 @@ ggplot(control_data,
         y = "CO2 Flux")
 ```
 
-## CO2 Flux vs. Daily Mean Soil Temperature (Freshwater Trees)
+## Freshwater Trees
 ```{r}
 Freshwater_data <- my_data %>%
     filter(Plot == "Freshwater")
@@ -835,7 +788,7 @@ ggplot(Freshwater_data,
         y = "CO2 Flux")
 ```
 
-## CO2 Flux vs. Daily Mean Soil Temperature (Seawater Trees)
+## Seawater Trees
 ```{r}
 Seawater_data <- my_data %>%
     filter(Plot == "Seawater")
@@ -851,9 +804,9 @@ ggplot(Seawater_data,
         y = "CO2 Flux")
 ```
 
-# Carbon Dioxide x Soil by Plot
+# Carbon Dioxide x Soil by Tree Species
 
-## CO2 Flux vs. Soil Temperature (Red Maple Trees)
+## Red Maple Trees
 ```{r}
  red_maple_data <- my_data %>%
   filter(Species == "Red Maple")
@@ -869,7 +822,7 @@ ggplot(Seawater_data,
          y = "CO2 Flux")
 ```
 
-## CO2 Flux vs. Soil Temperature (Beech Trees)
+## Beech Trees
 ```{r}
 beech_data <- my_data %>%
     filter(Species == "Beech")
@@ -885,7 +838,7 @@ beech_data <- my_data %>%
          y = "CO2 Flux")
 ```
 
-## CO2 Flux vs. Soil Temperature (Tulip Poplar Trees)
+## Tulip Poplar Trees
 ```{r}
 tulip_poplar_data <- my_data %>%
     filter(Species == "Tulip Poplar")
@@ -901,9 +854,9 @@ tulip_poplar_data <- my_data %>%
          y = "CO2 Flux")
 ```
 
-# Methane x Soil by Plot
+# Methane x Soil by Tree Species
 
-## CH4 Flux vs. Soil Temperature (Red Maple Trees)
+## Red Maple Trees
 ```{r}
 red_maple_data <- my_data %>%
     filter(Species == "Red Maple")
@@ -919,7 +872,7 @@ ggplot(red_maple_data,
         y = "CH4 Flux")
 ```
 
-## CH4 Flux vs. Soil Temperature (Beech Trees)
+## Beech Trees
 ```{r}
 beech_data <- my_data %>%
     filter(Species == "Beech")
@@ -935,7 +888,7 @@ ggplot(beech_data,
         y = "CH4 Flux")
 ```
 
-## CH4 Flux vs. Soil Temperature (Tulip Poplar Trees)
+## Tulip Poplar Trees
 ```{r}
 tulip_poplar_data <- my_data %>%
   filter(Species == "Tulip Poplar")
@@ -952,7 +905,6 @@ ggplot(tulip_poplar_data,
 ```
 
 # Categorize trees' Temp sensitivity 
-
 ```{r}
 ch4_sensitivity <- my_data %>%
     ungroup() %>%
@@ -969,8 +921,7 @@ ch4_sensitivity <- my_data %>%
 ch4_sensitivity
 ```
 
- # Visualization of Temp Sensitivity
- 
+# Visualization of Temp Sensitivity
 ```{r}
 ggplot(subset(ch4_sensitivity, sensitivity == "Positive"),
        aes(x = reorder(ID, estimate),
@@ -994,11 +945,9 @@ ggplot(subset(ch4_sensitivity, sensitivity == "Neutral"),
 ```
 
 ## Checking for negatives 
-
 ```{r}
 table(ch4_sensitivity$sensitivity)
 ```
-
 ```{r}
 negative_data <- ch4_sensitivity %>%
     filter(sensitivity == "Negative")
@@ -1008,7 +957,6 @@ negative_data
 ```
 
 # Compute Q10 (temperature sensitivity)
-
 ```{r}
 q10_results_list <- list()
 for(id in unique(my_data$ID)) {
