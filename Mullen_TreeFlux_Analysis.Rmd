@@ -376,7 +376,9 @@ my_data %>%
   facet_wrap(~ ID) +
   labs(title = "Red Maple CH4 Flux by Individual Tree")
 ```
+
 ## S7 is a big emitter, to the extent where it's fluxes throw off the dataset
+
 ```{r}
 my_data %>%
   filter(Species == "Red Maple") %>%
@@ -506,47 +508,6 @@ ggplot(my_data,aes(
   geom_point(alpha = 0.5) + 
   # use a polynomial to produce a curved line
   geom_smooth(method = "lm", formula = y ~ x + I(x^2), se = FALSE)
-```
-
-## GHG Flux x Soil Temp (colored by species)
-```{r}
-ggplot(my_data, aes(x = soil_temp_daily_mean,
-             y = CH4_lin_flux.estimate,
-             color = Species)) +
- geom_point(alpha = 0.5) +
- geom_smooth(method = "lm", se = FALSE) +
- labs(
-     x = "Daily Mean Soil Temperature (°C)",
-     y = "CH4 Flux" )
-```
-
-```{r}
-ggplot(my_data,aes(x = soil_temp_daily_mean,
-                   y = CO2_lin_flux.estimate,
-                   color = Species)) +
-  geom_point(alpha = 0.5) + 
-  # use a polynomial to produce a curved line
-  geom_smooth(method = "lm", formula = y ~ x + I(x^2), se = FALSE)
-```
-   
-# GHG vs Soil Temp (by plot)
-```{r}
-ggplot(my_data, aes(x = soil_temp_daily_mean, y = CH4_lin_flux.estimate)) +
-   geom_point(aes(color = Plot), alpha = 0.5) +
-       geom_smooth(method = "lm", se = FALSE) +
-     facet_wrap(~ Species) +
-    geom_vline(data = flood_date,
-aes(xintercept = NA), linetype = "dashed")  # placeholder style
-
-```
-
-```{r}
-ggplot(my_data, aes(x = soil_temp_daily_mean, y = CO2_lin_flux.estimate)) +
-   geom_point(aes(color = Plot), alpha = 0.5) +
-       geom_smooth(method = "lm", se = FALSE) +
-     facet_wrap(~ Species) +
-    geom_vline(data = flood_date,
-aes(xintercept = NA), linetype = "dashed")  # placeholder style
 ```
 
 ## Soil Temperature × Treatment Effects on GHG Flux
