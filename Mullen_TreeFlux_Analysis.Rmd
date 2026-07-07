@@ -525,9 +525,7 @@ ggplot(my_data, aes(x = soil_temp_daily_mean,
      geom_smooth(method = "lm", se = FALSE) +
      facet_wrap(~ Species) +
      labs(title = "Soil Temperature × Treatment Effects on CH4 Flux")
-```
 
-```{r}
 ggplot(my_data, aes(x = soil_temp_daily_mean,
                   y = CO2_lin_flux.estimate,
                      color = Plot)) +
@@ -577,45 +575,6 @@ ggplot(my_data, aes(soil_temp_daily_mean,
   geom_point(alpha = 0.4) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "Species Differences in Temperature Sensitivity (CO2)")
-```
-
-# Relationship between daily mean soil temperature and GHF flux
-## Facet by species, color by plot
-```{r}
-ggplot(my_data,
- aes(x = soil_temp_daily_mean,
-       y = CH4_lin_flux.estimate,
-            color = Plot)) +
-     geom_point(alpha = 0.35) +
-     geom_smooth(method = "loess", se = FALSE) +
-     facet_wrap(~Species)
-
-ggplot(my_data,
- aes(x = soil_temp_daily_mean,
-       y = CO2_lin_flux.estimate,
-            color = Plot)) +
-     geom_point(alpha = 0.35) +
-     geom_smooth(method = "loess", se = FALSE) +
-     facet_wrap(~Species)
-```
-
-## Facet by Plot, color by Species
-```{r}
-ggplot(my_data,
-  aes(x = soil_temp_daily_mean,
-            y = CH4_lin_flux.estimate,
-            color = Species)) +
-     geom_point(alpha = 0.35) +
-     geom_smooth(method = "loess", se = FALSE) +
-     facet_wrap(~Plot)
-
-ggplot(my_data,
-  aes(x = soil_temp_daily_mean,
-            y = CO2_lin_flux.estimate,
-            color = Species)) +
-     geom_point(alpha = 0.35) +
-     geom_smooth(method = "loess", se = FALSE) +
-     facet_wrap(~Plot)
 ```
 
 # Seasonal and Flood-Driven Dynamics of Soil Temperature and GHG Fluxes
@@ -745,7 +704,7 @@ ggplot(my_data,
          y = "CO2 Flux")
 ```
 
-# Methane x Soil Temp. by Plot (!there is an error to fix here!)
+# Methane x Soil Temp. by Plot 
 ```{r}
 # Generate plot-specific graphs
 for(plot in unique(my_data$Plot)) {
