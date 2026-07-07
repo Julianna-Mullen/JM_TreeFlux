@@ -495,7 +495,6 @@ ggplot() +  geom_line(
 ```
 
 # Visualizing Soil Temp Data x GHG Tree Flux
-
 ## GHG Tree Flux x Soil Temp (colored by species)
 ```{r}
 ggplot(my_data, aes(x = soil_temp_daily_mean,
@@ -677,7 +676,6 @@ p1 / p2 / p3 +
 ```
 
 # All Trees GHG Relationship 
-## So small its hard to identify patterns and isolate differences
 ```{r}
 ggplot(my_data,
      aes(x = soil_temp_daily_mean,
@@ -690,6 +688,8 @@ ggplot(my_data,
          x = "Daily Mean Soil Temperature (°C)",
          y = "CH4 Flux") 
 ```
+
+## So small its hard to identify patterns and isolate differences
 
 ```{r}
 ggplot(my_data,
@@ -704,177 +704,107 @@ ggplot(my_data,
          y = "CO2 Flux")
 ```
 
+# Plot colors
+```{r}
+plot_colors <- c(
+  "Freshwater" = "red",
+  "Control" = "green",
+  "Seawater" = "blue" )
+```
+
 # Methane x Soil Temp. by Plot 
 ```{r}
 # Generate plot-specific graphs
 for(plot in unique(my_data$Plot)) {
-  
   plot_data <- my_data %>%
-    dplyr::filter(Plot == plot)
+    filter(Plot == plot)
   
-  p <- ggplot(plot_data,
-              aes(x = soil_temp_daily_mean,
-                  y = CH4_lin_flux.estimate)) +
+  ggplot(plot_data,
+         aes(x = soil_temp_daily_mean,
+             y = CH4_lin_flux.estimate)) +
     geom_point(alpha = 0.4) +
-    geom_smooth(method = "loess", se = FALSE, color = "green") +
+        geom_smooth(
+      method = "loess",
+      se = FALSE,
+      color = plot_colors[plot] ) +
     facet_wrap(~ID, scales = "free") +
-    labs(
-      title = paste0("Methane Flux vs. Daily Mean Soil Temperature (", plot, " Trees)"),
-      x = "Daily Mean Soil Temperature (°C)",
-      y = "CH4 Flux"
-    )
-  
-  print(p)
+    labs( title = paste0("Methane Flux vs. Daily Mean Soil Temperature (", plot, " Trees)"),
+                     x = "Daily Mean Soil Temperature (°C)",
+                     y = "CH4 Flux")
 }
 ```
 
 # Carbon Dioxide x Soil by Plot
-## Control Trees
 ```{r}
-control_data <- my_data %>%
-    filter(Plot == "Control")
-ggplot(control_data,
-       aes(x = soil_temp_daily_mean,
-           y = CO2_lin_flux.estimate)) +
+# Generate plot-specific graphs
+for(plot in unique(my_data$Plot)) {
+  plot_data <- my_data %>%
+    filter(Plot == plot)
+  ggplot(plot_data,
+         aes(x = soil_temp_daily_mean,
+             y = CO2_lin_flux.estimate)) +
     geom_point(alpha = 0.4) +
-    geom_smooth(method = "loess", se = FALSE, color = "green") +
+        geom_smooth(
+      method = "loess",
+      se = FALSE,
+      color = plot_colors[plot] ) +
     facet_wrap(~ID, scales = "free") +
-    labs(
-        title = "CO2 Flux vs. Daily Mean Soil Temperature (Control Trees)",
-        x = "Daily Mean Soil Temperature (°C)",
-        y = "CO2 Flux")
+    labs( title = paste0("Carbon Dioxide Flux vs. Daily Mean Soil Temperature (", plot, " Trees)"),
+                     x = "Daily Mean Soil Temperature (°C)",
+                     y = "CO2 Flux")
+}
 ```
 
-## Freshwater Trees
+# Species colors
 ```{r}
-Freshwater_data <- my_data %>%
-    filter(Plot == "Freshwater")
-ggplot(Freshwater_data,
-       aes(x = soil_temp_daily_mean,
-           y = CO2_lin_flux.estimate)) +
-    geom_point(alpha = 0.4) +
-    geom_smooth(method = "loess", se = FALSE, color = "blue") +
-    facet_wrap(~ID, scales = "free") +
-    labs(
-        title = "CO2 Flux vs. Daily Mean Soil Temperature (Freshwater Trees)",
-        x = "Daily Mean Soil Temperature (°C)",
-        y = "CO2 Flux")
-```
-
-## Seawater Trees
-```{r}
-Seawater_data <- my_data %>%
-    filter(Plot == "Seawater")
-ggplot(Seawater_data,
-       aes(x = soil_temp_daily_mean,
-           y = CO2_lin_flux.estimate)) +
-    geom_point(alpha = 0.4) +
-    geom_smooth(method = "loess", se = FALSE, color = "red") +
-    facet_wrap(~ID, scales = "free") +
-    labs(
-        title = "CO2 Flux vs. Daily Mean Soil Temperature (Seawater Trees)",
-        x = "Daily Mean Soil Temperature (°C)",
-        y = "CO2 Flux")
+species_colors <- c(
+  "Red Maple" = "red",
+  "Beech" = "blue",
+  "Tulip Poplar" = "green" )
 ```
 
 # Carbon Dioxide x Soil by Tree Species
-
-## Red Maple Trees
 ```{r}
- red_maple_data <- my_data %>%
-  filter(Species == "Red Maple")
- ggplot(red_maple_data,
-        aes(x = soil_temp_daily_mean,
-            y = CO2_lin_flux.estimate)) +
-     geom_point(alpha = 0.4) +
-     geom_smooth(method = "loess", se = FALSE, color = "red") +
-     facet_wrap(~ID, scales = "free") +
-     labs(
-         title = "CO2 Flux vs Soil Temperature (Red Maple Trees)",
-       x = "Soil Temperature (°C)",
-         y = "CO2 Flux")
-```
-
-## Beech Trees
-```{r}
-beech_data <- my_data %>%
-    filter(Species == "Beech")
- ggplot(beech_data,
-        aes(x = soil_temp_daily_mean,
-            y = CO2_lin_flux.estimate)) +
-     geom_point(alpha = 0.4) +
-     geom_smooth(method = "loess", se = FALSE, color = "green") +
-     facet_wrap(~ID, scales = "free") +
-     labs(
-         title = "CO2 Flux vs Soil Temperature (Beech Trees)",
-         x = "Soil Temperature (°C)",
-         y = "CO2 Flux")
-```
-
-## Tulip Poplar Trees
-```{r}
-tulip_poplar_data <- my_data %>%
-    filter(Species == "Tulip Poplar")
- ggplot(tulip_poplar_data,
-        aes(x = soil_temp_daily_mean,
-            y = CO2_lin_flux.estimate)) +
-     geom_point(alpha = 0.4) +
-     geom_smooth(method = "loess", se = FALSE, color = "blue") +
-     facet_wrap(~ID, scales = "free") +
-     labs(
-         title = "CO2 Flux vs Soil Temperature (Tulip Poplar Trees)",
-         x = "Soil Temperature (°C)",
-         y = "CO2 Flux")
+# Generate species-specific graphs
+for (species in unique(my_data$Species)) {
+  species_data <- my_data %>%
+    filter(Species == species)
+  ggplot(species_data,
+    aes(x = soil_temp_daily_mean,
+        y = CO2_lin_flux.estimate) ) +
+    geom_point(alpha = 0.4) +
+    geom_smooth(
+      method = "loess",
+      se = FALSE,
+      color = species_colors[species] ) +
+    facet_wrap(~ID, scales = "free") +
+    labs(
+      title = paste0("CO2 Flux vs Soil Temperature (", species, " Trees)"),
+      x = "Soil Temperature (°C)",
+      y = "CO2 Flux" )
+}
 ```
 
 # Methane x Soil by Tree Species
-
-## Red Maple Trees
 ```{r}
-red_maple_data <- my_data %>%
-    filter(Species == "Red Maple")
-ggplot(red_maple_data,
-       aes(x = soil_temp_daily_mean,
-           y = CH4_lin_flux.estimate)) +
+# Generate species-specific graphs
+for (species in unique(my_data$Species)) {
+  species_data <- my_data %>%
+    filter(Species == species)
+  ggplot(species_data,
+    aes(x = soil_temp_daily_mean,
+        y = CH4_lin_flux.estimate) ) +
     geom_point(alpha = 0.4) +
-    geom_smooth(method = "loess", se = FALSE, color = "red") +
+    geom_smooth(
+      method = "loess",
+      se = FALSE,
+      color = species_colors[species] ) +
     facet_wrap(~ID, scales = "free") +
     labs(
-        title = "Methane Flux vs Soil Temperature (Red Maple Trees)",
-        x = "Soil Temperature (°C)",
-        y = "CH4 Flux")
-```
-
-## Beech Trees
-```{r}
-beech_data <- my_data %>%
-    filter(Species == "Beech")
-ggplot(beech_data,
-       aes(x = soil_temp_daily_mean,
-           y = CH4_lin_flux.estimate)) +
-    geom_point(alpha = 0.4) +
-    geom_smooth(method = "loess", se = FALSE, color = "green") +
-    facet_wrap(~ID, scales = "free") +
-    labs(
-        title = "Methane Flux vs Soil Temperature (Beech Trees)",
-        x = "Soil Temperature (°C)",
-        y = "CH4 Flux")
-```
-
-## Tulip Poplar Trees
-```{r}
-tulip_poplar_data <- my_data %>%
-  filter(Species == "Tulip Poplar")
-ggplot(tulip_poplar_data,
-       aes(x = soil_temp_daily_mean,
-           y = CH4_lin_flux.estimate)) +
-  geom_point(alpha = 0.4) +
-  geom_smooth(method = "loess", se = FALSE, color = "blue") +
-  facet_wrap(~ID, scales = "free") +
-  labs(
-    title = "CH₄ Flux vs Soil Temperature (Tulip Poplar Trees)",
-    x = "Soil Temperature (°C)",
-    y = "CH₄ Flux" )
+      title = paste0("CH4 Flux vs Soil Temperature (", species, " Trees)"),
+      x = "Soil Temperature (°C)",
+      y = "CH4 Flux" )
+}
 ```
 
 # Categorize trees' Temp sensitivity 
@@ -920,10 +850,6 @@ ggplot(subset(ch4_sensitivity, sensitivity == "Neutral"),
 ## Checking for negatives 
 ```{r}
 table(ch4_sensitivity$sensitivity)
-```
-```{r}
-negative_data <- ch4_sensitivity %>%
-    filter(sensitivity == "Negative")
 negative_data <- ch4_sensitivity %>%
     filter(sensitivity == "Negative")
 negative_data
