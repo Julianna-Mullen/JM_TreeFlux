@@ -842,6 +842,6 @@ q10_results <- bind_rows(q10_results_list, .id = "ID")
 ```
 
 ```{r}
-q10_results
+print(q10_results, n = 56)
 ```
 
