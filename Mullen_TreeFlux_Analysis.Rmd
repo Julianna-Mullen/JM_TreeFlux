@@ -719,7 +719,7 @@ for(plot in unique(my_data$Plot)) {
   plot_data <- my_data %>%
     filter(Plot == plot)
   
-  ggplot(plot_data,
+ p <- ggplot(plot_data,
          aes(x = soil_temp_daily_mean,
              y = CH4_lin_flux.estimate)) +
     geom_point(alpha = 0.4) +
@@ -731,6 +731,7 @@ for(plot in unique(my_data$Plot)) {
     labs( title = paste0("Methane Flux vs. Daily Mean Soil Temperature (", plot, " Trees)"),
                      x = "Daily Mean Soil Temperature (°C)",
                      y = "CH4 Flux")
+  print(p)
 }
 ```
 
@@ -740,7 +741,7 @@ for(plot in unique(my_data$Plot)) {
 for(plot in unique(my_data$Plot)) {
   plot_data <- my_data %>%
     filter(Plot == plot)
-  ggplot(plot_data,
+ p <- ggplot(plot_data,
          aes(x = soil_temp_daily_mean,
              y = CO2_lin_flux.estimate)) +
     geom_point(alpha = 0.4) +
@@ -752,6 +753,7 @@ for(plot in unique(my_data$Plot)) {
     labs( title = paste0("Carbon Dioxide Flux vs. Daily Mean Soil Temperature (", plot, " Trees)"),
                      x = "Daily Mean Soil Temperature (°C)",
                      y = "CO2 Flux")
+  print(p)
 }
 ```
 
@@ -769,7 +771,7 @@ species_colors <- c(
 for (species in unique(my_data$Species)) {
   species_data <- my_data %>%
     filter(Species == species)
-  ggplot(species_data,
+ p <- ggplot(species_data,
     aes(x = soil_temp_daily_mean,
         y = CO2_lin_flux.estimate) ) +
     geom_point(alpha = 0.4) +
@@ -782,6 +784,7 @@ for (species in unique(my_data$Species)) {
       title = paste0("CO2 Flux vs Soil Temperature (", species, " Trees)"),
       x = "Soil Temperature (°C)",
       y = "CO2 Flux" )
+  print(p)
 }
 ```
 
@@ -791,7 +794,7 @@ for (species in unique(my_data$Species)) {
 for (species in unique(my_data$Species)) {
   species_data <- my_data %>%
     filter(Species == species)
-  ggplot(species_data,
+ p <- ggplot(species_data,
     aes(x = soil_temp_daily_mean,
         y = CH4_lin_flux.estimate) ) +
     geom_point(alpha = 0.4) +
@@ -804,6 +807,7 @@ for (species in unique(my_data$Species)) {
       title = paste0("CH4 Flux vs Soil Temperature (", species, " Trees)"),
       x = "Soil Temperature (°C)",
       y = "CH4 Flux" )
+  print(p)
 }
 ```
 
