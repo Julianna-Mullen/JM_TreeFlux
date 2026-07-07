@@ -845,3 +845,26 @@ q10_results <- bind_rows(q10_results_list, .id = "ID")
 print(q10_results, n = 56)
 ```
 
+# Q10 fix
+```{r}
+q10_results <- list()
+for(id in unique(my_data$ID)) {
+  q10_data <- my_data %>%
+    filter(
+      ID == id,
+      CH4_lin_flux.estimate > 0,
+      !is.na(soil_temp_daily_mean) )
+  fit <- lm(log(CH4_lin_flux.estimate) ~ soil_temp_daily_mean,
+            data = q10_data)
+  pred <- predict(
+    fit,
+    newdata = data.frame(
+      soil_temp_daily_mean = c(5, 25)  ) )
+  Q10 <- (exp(pred[2]) / exp(pred[1]))^(10 / (25 - 5))
+  q10_results[[id]] <- data.frame(
+    ID = id,
+    Q10 = Q10 ) }
+q10_results <- bind_rows(q10_results) %>%
+  tibble::as_tibble()
+print(q10_results)
+```
