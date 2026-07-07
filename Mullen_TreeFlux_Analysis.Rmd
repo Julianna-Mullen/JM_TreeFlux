@@ -707,9 +707,9 @@ ggplot(my_data,
 # Plot colors
 ```{r}
 plot_colors <- c(
-  "Freshwater" = "red",
-  "Control" = "green",
-  "Seawater" = "blue" )
+  "Freshwater" = "orange",
+  "Control" = "hotpink",
+  "Seawater" = "turquoise" )
 ```
 
 # Methane x Soil Temp. by Plot 
