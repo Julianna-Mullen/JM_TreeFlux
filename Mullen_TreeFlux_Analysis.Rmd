@@ -67,7 +67,6 @@ message("Trees with NA species: ", sum(is.na(my_data$Species)))
 ```
 
 # Prep Soil Temp Data
-
 ## Take daily avg
 ```{r}
 soil_temp_data <- read_L2_variable(variable = "soil-temp-5cm",
@@ -139,7 +138,7 @@ print(my_data)
     x = "Year",
     y = "CH4 Flux",
     fill = "Year") +
-  theme(legend.position = "none")
+  theme(legend.position = "right")
 ```
 
 ```{r}
@@ -814,7 +813,6 @@ ggplot(subset(ch4_sensitivity, sensitivity == "Positive"),
        x = "Tree ID",
        y = "Slope")
 ```
-
 ```{r}
 ggplot(subset(ch4_sensitivity, sensitivity == "Neutral"),
        aes(x = reorder(ID, estimate),
@@ -825,8 +823,6 @@ ggplot(subset(ch4_sensitivity, sensitivity == "Neutral"),
        x = "Tree ID",
        y = "Slope") 
 ```
- 
- 
  
 # Visualization of Temp Sensitivity for Carbon Dioxide
 ```{r}
@@ -839,7 +835,6 @@ ggplot(subset(CO2_sensitivity, sensitivity == "Positive"),
        x = "Tree ID",
        y = "Slope")
 ```
-
 ```{r}
 ggplot(subset(CO2_sensitivity, sensitivity == "Neutral"),
        aes(x = reorder(ID, estimate),
@@ -850,7 +845,6 @@ ggplot(subset(CO2_sensitivity, sensitivity == "Neutral"),
        x = "Tree ID",
        y = "Slope") 
 ```
-
 
 ## Checking for negatives 
 ```{r}
@@ -930,5 +924,16 @@ for(id in unique(my_data$ID)) {
 q10_CO2results <- bind_rows(q10_CO2results) %>%
   tibble::as_tibble()
 print(q10_CO2results)
+```
+
+# Statistical Analysis
+```{r}
+mod <- lm(Q10 ~ Plot * Species, data = q10_CH4results)
+anora(mod)
+```
+
+```{r}
+mod <- lm(Q10 ~ Plot * Species, data = q10_CO2results)
+anora(mod)
 ```
 
