@@ -881,6 +881,8 @@ for(id in unique(my_data$ID)) {
   Q10 <- (exp(pred[2]) / exp(pred[1]))^(10 / (temp_max - temp_min))
   q10_CH4results[[id]] <- data.frame(
     ID = id,
+    Plot = q10_data$Plot[1],
+    Species = q10_data$Species[1],
     temp_min = temp_min,
     temp_max = temp_max,
     Q10 = Q10
@@ -917,6 +919,8 @@ for(id in unique(my_data$ID)) {
   Q10 <- (exp(pred[2]) / exp(pred[1]))^(10 / (temp_max - temp_min))
   q10_CO2results[[id]] <- data.frame(
     ID = id,
+    Plot = q10_data$Plot[1],
+    Species = q10_data$Species[1],
     temp_min = temp_min,
     temp_max = temp_max,
     Q10 = Q10
@@ -928,12 +932,13 @@ print(q10_CO2results)
 
 # Statistical Analysis
 ```{r}
+# CH4
 mod <- lm(Q10 ~ Plot * Species, data = q10_CH4results)
-anora(mod)
+anova(mod)
 ```
-
 ```{r}
+# CO2
 mod <- lm(Q10 ~ Plot * Species, data = q10_CO2results)
-anora(mod)
+anova(mod)
 ```
 
