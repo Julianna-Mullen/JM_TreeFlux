@@ -769,7 +769,7 @@ for (species in unique(my_data$Species)) {
 }
 ```
 
-# Categorize trees' Temp sensitivity 
+# Categorize trees' Temp sensitivity for Methane
 ```{r}
 ch4_sensitivity <- my_data %>%
     ungroup() %>%
@@ -786,7 +786,24 @@ ch4_sensitivity <- my_data %>%
 ch4_sensitivity
 ```
 
-# Visualization of Temp Sensitivity
+# Categorize trees' Temp sensitivity for Carbon Dioxide
+```{r}
+CO2_sensitivity <- my_data %>%
+    ungroup() %>%
+     reframe(
+         lm(CO2_lin_flux.estimate ~ soil_temp_daily_mean) %>% tidy(),
+         .by = ID ) %>%
+    filter(term == "soil_temp_daily_mean") %>%
+    mutate(
+        sensitivity = case_when(
+            p.value < 0.05 & estimate > 0 ~ "Positive",
+            p.value < 0.05 & estimate < 0 ~ "Negative",
+            TRUE ~ "Neutral"
+        ))
+CO2_sensitivity
+```
+
+# Visualization of Temp Sensitivity for Methane
 ```{r}
 ggplot(subset(ch4_sensitivity, sensitivity == "Positive"),
        aes(x = reorder(ID, estimate),
@@ -797,7 +814,7 @@ ggplot(subset(ch4_sensitivity, sensitivity == "Positive"),
        x = "Tree ID",
        y = "Slope")
 ```
- 
+
 ```{r}
 ggplot(subset(ch4_sensitivity, sensitivity == "Neutral"),
        aes(x = reorder(ID, estimate),
@@ -808,6 +825,32 @@ ggplot(subset(ch4_sensitivity, sensitivity == "Neutral"),
        x = "Tree ID",
        y = "Slope") 
 ```
+ 
+ 
+ 
+# Visualization of Temp Sensitivity for Carbon Dioxide
+```{r}
+ggplot(subset(CO2_sensitivity, sensitivity == "Positive"),
+       aes(x = reorder(ID, estimate),
+           y = estimate)) +
+  geom_col(fill = "darkgreen") +
+  coord_flip() +
+  labs(title = "Positive Temperature Sensitivity (CO2)",
+       x = "Tree ID",
+       y = "Slope")
+```
+
+```{r}
+ggplot(subset(CO2_sensitivity, sensitivity == "Neutral"),
+       aes(x = reorder(ID, estimate),
+           y = estimate)) +
+  geom_col(fill = "blue") +
+  coord_flip() +
+  labs(title = "Neutral Temperature Sensitivity (CO2)",
+       x = "Tree ID",
+       y = "Slope") 
+```
+
 
 ## Checking for negatives 
 ```{r}
@@ -817,54 +860,75 @@ negative_data <- ch4_sensitivity %>%
 negative_data
 ```
 
+# Compute Q10 (temperature sensitivity) for Methane
+```{r}
 # Compute Q10 (temperature sensitivity)
-```{r}
-q10_results_list <- list()
-for(id in unique(my_data$ID)) {
-
-  q10_data <- my_data |> filter(ID == id)
-  
-# Compute Q10 using the method we went over
-  fit <- lm(log(CH4_lin_flux.estimate) ~ soil_temp_daily_mean, data = q10_data)
-
-x <- seq(min(q10_data$soil_temp_daily_mean),
-         max(q10_data$soil_temp_daily_mean),
-         length.out = 20)
-
-y_pred <- predict(fit, newdata = data.frame(soil_temp_daily_mean = x))
-
-q10 <- (y_pred[20] / y_pred[1]) ^ (10 / (x[20] - x[1]))
-  # Save in our running list
-  q10_results_list[[id]] <- q10
-}
-# Bind the list into a summary data frame
-q10_results <- bind_rows(q10_results_list, .id = "ID")
-```
-
-```{r}
-print(q10_results, n = 56)
-```
-
-# Q10 fix
-```{r}
-q10_results <- list()
+q10_CH4results <- list()
 for(id in unique(my_data$ID)) {
   q10_data <- my_data %>%
     filter(
       ID == id,
       CH4_lin_flux.estimate > 0,
-      !is.na(soil_temp_daily_mean) )
+      !is.na(soil_temp_daily_mean)  )
+  # Skip trees with too few positive observations
+  if(nrow(q10_data) < 3) next
+  # Calculate the actual temperature range for this tree
+  temp_min <- min(q10_data$soil_temp_daily_mean, na.rm = TRUE)
+  temp_max <- max(q10_data$soil_temp_daily_mean, na.rm = TRUE)
+  # Fit log-linear temperature response
   fit <- lm(log(CH4_lin_flux.estimate) ~ soil_temp_daily_mean,
             data = q10_data)
+  # Predict flux at observed minimum and maximum temperatures
   pred <- predict(
     fit,
     newdata = data.frame(
-      soil_temp_daily_mean = c(5, 25)  ) )
-  Q10 <- (exp(pred[2]) / exp(pred[1]))^(10 / (25 - 5))
-  q10_results[[id]] <- data.frame(
+      soil_temp_daily_mean = c(temp_min, temp_max) ) )
+  # Calculate Q10 across the observed temperature range
+  Q10 <- (exp(pred[2]) / exp(pred[1]))^(10 / (temp_max - temp_min))
+  q10_CH4results[[id]] <- data.frame(
     ID = id,
-    Q10 = Q10 ) }
-q10_results <- bind_rows(q10_results) %>%
+    temp_min = temp_min,
+    temp_max = temp_max,
+    Q10 = Q10
+  ) }
+q10_CH4results <- bind_rows(q10_CH4results) %>%
   tibble::as_tibble()
-print(q10_results)
+print(q10_CH4results)
 ```
+
+# Compute Q10 (temperature sensitivity) for Carbon Dioxide
+```{r}
+# Compute Q10 (temperature sensitivity)
+q10_CO2results <- list()
+for(id in unique(my_data$ID)) {
+  q10_data <- my_data %>%
+    filter(
+      ID == id,
+      CO2_lin_flux.estimate > 0,
+      !is.na(soil_temp_daily_mean)  )
+  # Skip trees with too few positive observations
+  if(nrow(q10_data) < 3) next
+  # Calculate the actual temperature range for this tree
+  temp_min <- min(q10_data$soil_temp_daily_mean, na.rm = TRUE)
+  temp_max <- max(q10_data$soil_temp_daily_mean, na.rm = TRUE)
+  # Fit log-linear temperature response
+  fit <- lm(log(CO2_lin_flux.estimate) ~ soil_temp_daily_mean,
+            data = q10_data)
+  # Predict flux at observed minimum and maximum temperatures
+  pred <- predict(
+    fit,
+    newdata = data.frame(
+      soil_temp_daily_mean = c(temp_min, temp_max) ) )
+  # Calculate Q10 across the observed temperature range
+  Q10 <- (exp(pred[2]) / exp(pred[1]))^(10 / (temp_max - temp_min))
+  q10_CO2results[[id]] <- data.frame(
+    ID = id,
+    temp_min = temp_min,
+    temp_max = temp_max,
+    Q10 = Q10
+  ) }
+q10_CO2results <- bind_rows(q10_CO2results) %>%
+  tibble::as_tibble()
+print(q10_CO2results)
+```
+
