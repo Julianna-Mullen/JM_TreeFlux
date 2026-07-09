@@ -942,3 +942,59 @@ mod <- lm(Q10 ~ Plot * Species, data = q10_CO2results)
 anova(mod)
 ```
 
+```{r}
+q10_CH4_summary <- q10_CH4results %>%
+  group_by(Species, Plot) %>%
+  summarize(
+    n = n(),
+    mean_Q10 = mean(Q10, na.rm = TRUE),
+    sd_Q10 = sd(Q10, na.rm = TRUE),
+    median_Q10 = median(Q10, na.rm = TRUE),
+    min_Q10 = min(Q10, na.rm = TRUE),
+    max_Q10 = max(Q10, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+knitr::kable(q10_CH4_summary, digits = 2)
+```
+
+```{r}
+q10_CO2_summary <- q10_CO2results %>%
+  group_by(Species, Plot) %>%
+  summarize(
+    n = n(),
+    mean_Q10 = mean(Q10, na.rm = TRUE),
+    sd_Q10 = sd(Q10, na.rm = TRUE),
+    median_Q10 = median(Q10, na.rm = TRUE),
+    min_Q10 = min(Q10, na.rm = TRUE),
+    max_Q10 = max(Q10, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+knitr::kable(q10_CO2_summary, digits = 2)
+```
+
+```{r}
+ggplot(q10_CH4results,
+       aes(x = Plot, y = Q10, fill = Plot)) +
+  geom_boxplot(alpha = 0.7) +
+  geom_jitter(width = 0.15, alpha = 0.6) +
+  facet_wrap(~Species) +
+  labs(
+    title = "CH4 Temperature Sensitivity (Q10) by Species and Treatment",
+    x = "Treatment",
+    y = "Q10") 
+```
+
+```{r}
+ggplot(q10_CO2results,
+       aes(x = Plot, y = Q10, fill = Plot)) +
+  geom_boxplot(alpha = 0.7) +
+  geom_jitter(width = 0.15, alpha = 0.6) +
+  facet_wrap(~Species) +
+  labs(
+    title = "CO2 Temperature Sensitivity (Q10) by Species and Treatment",
+    x = "Treatment",
+    y = "Q10" ) 
+```
+
