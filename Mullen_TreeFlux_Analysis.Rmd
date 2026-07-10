@@ -1099,3 +1099,14 @@ summary(mod_CO2)
 anova(mod_CO2)
 ```
 
+```{r}
+my_data %>%
+  ungroup() %>%
+  summarise(
+    CH4_min = min(CH4_lin_flux.estimate, na.rm = TRUE),
+    CH4_max = max(CH4_lin_flux.estimate, na.rm = TRUE),
+    CO2_min = min(CO2_lin_flux.estimate, na.rm = TRUE),
+    CO2_max = max(CO2_lin_flux.estimate, na.rm = TRUE)
+  )
+```
+
