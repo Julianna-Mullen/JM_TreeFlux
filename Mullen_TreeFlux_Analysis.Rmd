@@ -1143,3 +1143,127 @@ my_data %>%
     CO2_max = max(CO2_lin_flux.estimate, na.rm = TRUE)
   )
 ```
+
+# Flood week visualization 
+```{r}
+# Select flood period observations and create flood day scale
+flood_week <- my_data %>%
+  ungroup() %>%
+  filter(Timepoint %in% c(
+    "T0",
+    "T1",
+    "D1PM",
+    "D2AM",
+    "D2PM",
+    "D3AM",
+    "D3PM",
+    "D4_AM",
+    "D4_PM",
+    "D5_AM",
+    "D5_PM",
+    "T3",
+    "T3A",
+    "T3B"
+  )) %>%
+  group_by(Year) %>%
+  mutate(
+    Flood_day = as.numeric(Date - min(Date))
+  ) %>%
+  ungroup()
+
+# Summarize methane response by treatment
+### condenses tree-level measurements into treatment-level averages
+flood_CH4_daily <- flood_week %>%
+  group_by(Year, Species, Plot, Flood_day) %>%
+  summarize(
+    mean_CH4 = mean(CH4_lin_flux.estimate, na.rm = TRUE),
+    se_CH4 = sd(CH4_lin_flux.estimate, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop" )
+
+# Summarize carbon dioxide response by treatment
+###  condenses tree-level measurements into treatment-level averages
+flood_CO2_daily <- flood_week %>%
+  group_by(Year, Species, Plot, Flood_day) %>%
+  summarize(
+    mean_CO2 = mean(CO2_lin_flux.estimate, na.rm = TRUE),
+    se_CO2 = sd(CO2_lin_flux.estimate, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop" )
+
+# CH4 flood response plot
+ggplot(
+  flood_CH4_daily,
+  aes(
+    x = Flood_day,
+    y = mean_CH4,
+    color = Plot,
+    group = interaction(Year, Plot) ) ) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  geom_errorbar(
+    aes(
+      ymin = mean_CH4 - se_CH4,
+      ymax = mean_CH4 + se_CH4 ),
+    width = 0.1 ) +
+  facet_grid(Year ~ Species, scales = "free_x") +
+  labs(
+    title = "CH4 Response During Flood Treatment",
+    x = "Days Since Flood Began",
+    y = "Mean CH4 Flux",
+    color = "Treatment" ) 
+
+# CO2 flood response plot
+ggplot(
+  flood_CO2_daily,
+  aes(
+    x = Flood_day,
+    y = mean_CO2,
+    color = Plot,
+    group = interaction(Year, Plot) ) ) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  geom_errorbar(
+    aes(
+      ymin = mean_CO2 - se_CO2,
+      ymax = mean_CO2 + se_CO2 ),
+    width = 0.1  ) +
+  facet_grid(Year ~ Species, scales = "free_x") +
+  labs(
+    title = "CO2 Response During Flood Treatment",
+    x = "Days Since Flood Began",
+    y = "Mean CO2 Flux",
+    color = "Treatment")
+```
+
+# Which species had the highest average flux
+```{r}
+my_data %>%
+  group_by(Species) %>%
+  summarize(
+    mean_CH4 = mean(CH4_lin_flux.estimate, na.rm = TRUE),
+    median_CH4 = median(CH4_lin_flux.estimate, na.rm = TRUE),
+    max_CH4 = max(CH4_lin_flux.estimate, na.rm = TRUE),
+    n = n()
+  ) %>%
+  arrange(desc(mean_CH4))
+
+my_data %>%
+  group_by(Species) %>%
+  summarize(
+    mean_CO2 = mean(CO2_lin_flux.estimate, na.rm = TRUE),
+    median_CO2 = median(CO2_lin_flux.estimate, na.rm = TRUE),
+    max_CO2 = max(CO2_lin_flux.estimate, na.rm = TRUE),
+    n = n()
+  ) %>%
+  arrange(desc(mean_CO2))
+
+my_data %>%
+  filter(ID != "S7") %>%
+  group_by(Species) %>%
+  summarize(
+    mean_CH4 = mean(CH4_lin_flux.estimate, na.rm = TRUE),
+    median_CH4 = median(CH4_lin_flux.estimate, na.rm = TRUE),
+    n = n()
+  ) %>%
+  arrange(desc(mean_CH4))
+```
+
