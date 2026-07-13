@@ -930,18 +930,23 @@ q10_CO2results <- bind_rows(q10_CO2results) %>%
 print(q10_CO2results)
 ```
 
-# Statistical Analysis
+# Statistical Analysis (fitting a linear model and then doing an analysis of variance)
+
+## Methane
 ```{r}
 # CH4
 mod <- lm(Q10 ~ Plot * Species, data = q10_CH4results)
 anova(mod)
 ```
+## Carbon Dioxide
 ```{r}
 # CO2
 mod <- lm(Q10 ~ Plot * Species, data = q10_CO2results)
 anova(mod)
 ```
 
+# Table summary of Q10
+## Methane
 ```{r}
 q10_CH4_summary <- q10_CH4results %>%
   group_by(Species, Plot) %>%
@@ -958,6 +963,7 @@ q10_CH4_summary <- q10_CH4results %>%
 knitr::kable(q10_CH4_summary, digits = 2)
 ```
 
+# Carbon Dioxide
 ```{r}
 q10_CO2_summary <- q10_CO2results %>%
   group_by(Species, Plot) %>%
@@ -974,6 +980,8 @@ q10_CO2_summary <- q10_CO2results %>%
 knitr::kable(q10_CO2_summary, digits = 2)
 ```
 
+# Boxplots of Q10
+## Methane
 ```{r}
 ggplot(q10_CH4results,
        aes(x = Plot, y = Q10, fill = Plot)) +
@@ -986,6 +994,7 @@ ggplot(q10_CH4results,
     y = "Q10") 
 ```
 
+# Carbon Dioxide
 ```{r}
 ggplot(q10_CO2results,
        aes(x = Plot, y = Q10, fill = Plot)) +
