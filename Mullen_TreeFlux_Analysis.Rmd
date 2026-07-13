@@ -1007,11 +1007,8 @@ ggplot(q10_CO2results,
     y = "Q10" ) 
 ```
 
-```{r}
-# ============================================================
 # Treatment Effect Relative to Control Over Time
-# ============================================================
-
+```{r}
 # ----- Create control datasets -----
 quarterly_CH4_control <- quarterly_CH4 %>%
   filter(Plot == "Control") %>%
@@ -1026,6 +1023,7 @@ quarterly_CO2_control <- quarterly_CO2 %>%
     YearQuarter,
     Species,
     control_flux = mean_flux )
+
 # ----- Join control values to treatment plots -----
 quarterly_CH4_diff <- quarterly_CH4 %>%
   filter(Plot != "Control") %>%
@@ -1041,9 +1039,7 @@ quarterly_CO2_diff <- quarterly_CO2 %>%
     by = c("YearQuarter", "Species") ) %>%
   mutate( flux_difference = mean_flux - control_flux )
 
-# ============================================================
 # CH4 Plot
-# ============================================================
 ggplot(
   quarterly_CH4_diff,
   aes(
@@ -1061,10 +1057,8 @@ ggplot(
     y = "Treatment − Control CH4 Flux" ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# ============================================================
-# CO2 Plot
-# ============================================================
 
+# CO2 Plot
 ggplot(
   quarterly_CO2_diff,
   aes(
@@ -1082,32 +1076,27 @@ ggplot(
     y = "Treatment − Control CO2 Flux"  ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# ============================================================
-# Linear Models
-# Tests whether treatment plots diverge from the control over time
-# ============================================================
-
+# Linear Models (Tests whether treatment plots diverge from the control over time)
+## Treatment - Control (How far each treatment is from the control)
 mod_CH4 <- lm(
   flux_difference ~ YearQuarter * Plot + Species,
   data = quarterly_CH4_diff )
 
+#Does the treatment-control difference change over time?
 mod_CO2 <- lm(
   flux_difference ~ YearQuarter * Plot + Species,
   data = quarterly_CO2_diff )
 
-cat("\n=========================\n")
-cat("CH4 MODEL\n")
-cat("=========================\n")
+# Methane Model
 summary(mod_CH4)
 anova(mod_CH4)
 
-cat("\n=========================\n")
-cat("CO2 MODEL\n")
-cat("=========================\n")
+# Carbon Dioxide Model
 summary(mod_CO2)
 anova(mod_CO2)
 ```
 
+# GHG Min + Max Fluxes
 ```{r}
 my_data %>%
   ungroup() %>%
