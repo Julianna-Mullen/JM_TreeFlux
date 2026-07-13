@@ -1038,8 +1038,10 @@ quarterly_CO2_diff <- quarterly_CO2 %>%
     quarterly_CO2_control,
     by = c("YearQuarter", "Species") ) %>%
   mutate( flux_difference = mean_flux - control_flux )
+```
 
-# CH4 Plot
+## CH4 Plot
+```{r}
 ggplot(
   quarterly_CH4_diff,
   aes(
@@ -1056,9 +1058,10 @@ ggplot(
     x = "Year-Quarter",
     y = "Treatment − Control CH4 Flux" ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
 
-
-# CO2 Plot
+## CO2 Plot
+```{r}
 ggplot(
   quarterly_CO2_diff,
   aes(
@@ -1075,23 +1078,31 @@ ggplot(
     x = "Year-Quarter",
     y = "Treatment − Control CO2 Flux"  ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
 
 # Linear Models (Tests whether treatment plots diverge from the control over time)
 ## Treatment - Control (How far each treatment is from the control)
+```{r}
 mod_CH4 <- lm(
   flux_difference ~ YearQuarter * Plot + Species,
   data = quarterly_CH4_diff )
+```
 
-#Does the treatment-control difference change over time?
+## Does the treatment-control difference change over time?
+```{r}
 mod_CO2 <- lm(
   flux_difference ~ YearQuarter * Plot + Species,
   data = quarterly_CO2_diff )
+```
 
-# Methane Model
+## Methane Model
+```{r}
 summary(mod_CH4)
 anova(mod_CH4)
+```
 
-# Carbon Dioxide Model
+## Carbon Dioxide Model
+```{r}
 summary(mod_CO2)
 anova(mod_CO2)
 ```
@@ -1107,4 +1118,3 @@ my_data %>%
     CO2_max = max(CO2_lin_flux.estimate, na.rm = TRUE)
   )
 ```
-
