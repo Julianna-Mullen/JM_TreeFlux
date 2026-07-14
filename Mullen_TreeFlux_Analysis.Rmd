@@ -1149,25 +1149,10 @@ my_data %>%
 # Select flood period observations and create flood day scale
 flood_week <- my_data %>%
   ungroup() %>%
-  filter(Timepoint %in% c(
-    "T0",
-    "T1",
-    "D1PM",
-    "D2AM",
-    "D2PM",
-    "D3AM",
-    "D3PM",
-    "D4_AM",
-    "D4_PM",
-    "D5_AM",
-    "D5_PM",
-    "T3",
-    "T3A",
-    "T3B"
-  )) %>%
+  filter(Timepoint != "(none)", ID != "S7") |>
   group_by(Year) %>%
   mutate(
-    Flood_day = as.numeric(Date - min(Date))
+    Flood_day = as.numeric(Date - min(Date) - 1)
   ) %>%
   ungroup()
 
@@ -1189,24 +1174,36 @@ flood_CO2_daily <- flood_week %>%
     se_CO2 = sd(CO2_lin_flux.estimate, na.rm = TRUE) / sqrt(n()),
     .groups = "drop" )
 
+# Calculate relative (on our Flood_day axis) flood dates
+flood_date |> 
+  mutate(Year = year(Start),
+         day_start = -0.5, 
+         day_end = yday(End) - yday(Start) + 0.5) -> 
+  flood_date_relative
+
 # CH4 flood response plot
-ggplot(
-  flood_CH4_daily,
-  aes(
-    x = Flood_day,
-    y = mean_CH4,
-    color = Plot,
-    group = interaction(Year, Plot) ) ) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 2) +
+ggplot(flood_CH4_daily) +
+  # background showing flooding period
+  geom_rect(data = flood_date_relative, 
+            aes(xmin = day_start, xmax = day_end, 
+                ymin = -Inf, ymax = Inf),
+            fill = "lightgrey") +
+  # data
+  geom_line(aes(x = Flood_day,
+    y = mean_CH4, color = Plot,
+    group = interaction(Year, Plot)), linewidth = 1) +
+  geom_point(aes(x = Flood_day,
+    y = mean_CH4, color = Plot), size = 2) +
   geom_errorbar(
-    aes(
+    aes(x = Flood_day,
       ymin = mean_CH4 - se_CH4,
       ymax = mean_CH4 + se_CH4 ),
     width = 0.1 ) +
-  facet_grid(Year ~ Species, scales = "free_x") +
+  # faceting and labels
+  facet_grid(Species ~ Year, scales = "free") +
   labs(
     title = "CH4 Response During Flood Treatment",
+    subtitle = "(excluding S7)",
     x = "Days Since Flood Began",
     y = "Mean CH4 Flux",
     color = "Treatment" ) 
