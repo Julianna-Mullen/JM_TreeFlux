@@ -125,11 +125,16 @@ print(my_data)
 # BBL: print summary of fluxes? A table with mean, min, max and date ranges
 ```
 
+This is the largest, or one of the largest, datasets ever assembled for 
+tree stem fluxes: `r nrow(my_data)` observations for CO2 and CH4.
+
 # Initial visualizations of Raw Data
 
 ## Boxplots
 ```{r}
- my_data %>%
+summary(my_data$CH4_lin_flux.estimate)
+
+my_data %>%
   ggplot(aes(x = factor(Year),
              y = CH4_lin_flux.estimate,
              fill = factor(Year))) +
@@ -141,8 +146,12 @@ print(my_data)
     fill = "Year") +
   theme(legend.position = "right")
 ```
+Note that most trees exhibit CH4 emissions, but uptake does occur
+in `sum(my_data$CH4_lin_flux.estimate < 0)` of the observations.
 
 ```{r}
+summary(my_data$CO2_lin_flux.estimate)
+
 my_data %>%
   ggplot(aes(x = factor(Year),
              y = CO2_lin_flux.estimate,
@@ -226,12 +235,16 @@ ggplot(heat_data_CO2,aes(x = Year, y = Species, fill = mean_flux)) +
 ggplot(my_data, aes(x = CO2_lin_flux.estimate, y = CH4_lin_flux.estimate, color = Species)) +
   geom_point(alpha = 0.4) +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Relationship Between CO2 and CH4 Flux by Species",x = "CO2 Flux",y = "CH4 Flux",
+  labs(title = "Relationship Between CO2 and CH4 Flux by Species", 
+       x = "CO2 Flux", y = "CH4 Flux",
        color = "Species") +
   theme_minimal()
 ```
 
 # Quarterly data
+
+Summarizing by quarter provides a nice way to look at seasonal trends without
+the inconsistency of the date-specific data.
 
 ## Creation of Quarters
 ```{r}
@@ -382,7 +395,8 @@ ggplot(quarterly_CH4,
 
 ## Isolating Red Maple Trees (finding outlier (S7)) 
 
-Taking a closer look at the Red Maple trees to identify why the flux averages are so high
+Taking a closer look at the Red Maple trees to identify why the flux averages
+are so high. Answer: there's one 'super emitter' S7.
 
 ```{r}
 my_data %>%
@@ -393,7 +407,7 @@ my_data %>%
   labs(title = "Red Maple CH4 Flux by Individual Tree")
 ```
 
-## S7 is a big emitter, to the extent where its fluxes throw off the dataset
+## S7 CO2 fluxes are normal, though
 
 ```{r}
 my_data %>%
@@ -508,6 +522,7 @@ ggplot() +  geom_line(
 # Temperature sensitivity
 
 ## Visualizing Soil Temp Data x GHG Tree Flux
+
 ```{r}
 ggplot(my_data, aes(x = soil_temp_daily_mean,
                   y = CH4_lin_flux.estimate,
@@ -536,6 +551,7 @@ ggplot(my_data, aes(soil_temp_daily_mean, CH4_lin_flux.estimate)) +
   facet_wrap(~ Plot) +
   labs(title = "Nonlinear Temperature Response of CH4")
 ```
+S7 has higher fluxes AND is much more temperature sensitive!
 
 ## Nonlinear Temperature Response of CO2 
 
@@ -687,6 +703,10 @@ plot_colors <- c(
 ```
 
 ## Methane x Soil Temp. by Plot 
+
+The data are noisy, and some trees' fluxes exhibit the expected exponential rise
+with temperature...but others do not.
+
 ```{r}
 # Generate plot-specific graphs
 for(plot in unique(my_data$Plot)) {
@@ -710,6 +730,9 @@ for(plot in unique(my_data$Plot)) {
 ```
 
 ## Carbon Dioxide x Soil Temp. by Plot
+
+CO2 is much cleaner and predictable.
+
 ```{r}
 # Generate plot-specific graphs
 for(plot in unique(my_data$Plot)) {
@@ -873,6 +896,17 @@ negative_data
 
 # Q10
 
+Most biological processes are temperature-sensitive to some degree,
+and if there aren't other limiting factors it's very common for fluxes (e.g.)
+to double with every 10C rise. This is referred to as "a Q10 of 2.0".
+
+![A Wikipedia figure demonstrating Q10](figures/q10.png)
+
+From https://en.wikipedia.org/wiki/Q10_(temperature_coefficient).
+
+For each tree, fit a linear model to log-transformed flux data and then
+calculate Q10 from the model slope over the temperature range of the data.
+
 ## Compute Q10 (temperature sensitivity) for Methane
 ```{r}
 # Compute Q10 (temperature sensitivity)
@@ -952,12 +986,18 @@ print(q10_CO2results)
 ## Statistical Analysis (fitting a linear model and then doing an analysis of variance)
 
 ### Methane
+
+CH4 temperature sensitivity does not vary by species or plot:
+
 ```{r}
 # CH4
 mod <- lm(Q10 ~ Plot * Species, data = q10_CH4results)
 anova(mod)
 ```
 ### Carbon Dioxide
+
+CO2 temperature sensitivity varies significantly by species:
+
 ```{r}
 # CO2
 mod <- lm(Q10 ~ Plot * Species, data = q10_CO2results)
@@ -1144,6 +1184,9 @@ Tests whether treatment plots diverge from the control over time
 mod_CH4 <- lm(
   flux_difference ~ YearQuarter * Plot * Species,
   data = quarterly_CH4_diff )
+
+#summary(mod_CH4)
+anova(mod_CH4)
 ```
 
 ### Does the treatment-control difference change over time?
@@ -1151,17 +1194,8 @@ mod_CH4 <- lm(
 mod_CO2 <- lm(
   flux_difference ~ YearQuarter * Plot * Species,
   data = quarterly_CO2_diff )
-```
 
-### Methane Model
-```{r}
-summary(mod_CH4)
-anova(mod_CH4)
-```
-
-### Carbon Dioxide Model
-```{r}
-summary(mod_CO2)
+#summary(mod_CO2)
 anova(mod_CO2)
 ```
 
