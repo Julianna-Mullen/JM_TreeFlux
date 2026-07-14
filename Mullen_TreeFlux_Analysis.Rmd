@@ -964,6 +964,39 @@ mod <- lm(Q10 ~ Plot * Species, data = q10_CO2results)
 anova(mod)
 ```
 
+## Which species had the highest average flux
+```{r}
+my_data %>%
+  group_by(Species) %>%
+  summarize(
+    mean_CH4 = mean(CH4_lin_flux.estimate, na.rm = TRUE),
+    median_CH4 = median(CH4_lin_flux.estimate, na.rm = TRUE),
+    max_CH4 = max(CH4_lin_flux.estimate, na.rm = TRUE),
+    n = n()
+  ) %>%
+  arrange(desc(mean_CH4))
+
+my_data %>%
+  group_by(Species) %>%
+  summarize(
+    mean_CO2 = mean(CO2_lin_flux.estimate, na.rm = TRUE),
+    median_CO2 = median(CO2_lin_flux.estimate, na.rm = TRUE),
+    max_CO2 = max(CO2_lin_flux.estimate, na.rm = TRUE),
+    n = n()
+  ) %>%
+  arrange(desc(mean_CO2))
+
+my_data %>%
+  filter(ID != "S7") %>%
+  group_by(Species) %>%
+  summarize(
+    mean_CH4 = mean(CH4_lin_flux.estimate, na.rm = TRUE),
+    median_CH4 = median(CH4_lin_flux.estimate, na.rm = TRUE),
+    n = n()
+  ) %>%
+  arrange(desc(mean_CH4))
+```
+
 ## Table summary of Q10
 ### Methane
 ```{r}
@@ -1231,36 +1264,5 @@ ggplot(
     color = "Treatment")
 ```
 
-# Which species had the highest average flux
-```{r}
-my_data %>%
-  group_by(Species) %>%
-  summarize(
-    mean_CH4 = mean(CH4_lin_flux.estimate, na.rm = TRUE),
-    median_CH4 = median(CH4_lin_flux.estimate, na.rm = TRUE),
-    max_CH4 = max(CH4_lin_flux.estimate, na.rm = TRUE),
-    n = n()
-  ) %>%
-  arrange(desc(mean_CH4))
 
-my_data %>%
-  group_by(Species) %>%
-  summarize(
-    mean_CO2 = mean(CO2_lin_flux.estimate, na.rm = TRUE),
-    median_CO2 = median(CO2_lin_flux.estimate, na.rm = TRUE),
-    max_CO2 = max(CO2_lin_flux.estimate, na.rm = TRUE),
-    n = n()
-  ) %>%
-  arrange(desc(mean_CO2))
-
-my_data %>%
-  filter(ID != "S7") %>%
-  group_by(Species) %>%
-  summarize(
-    mean_CH4 = mean(CH4_lin_flux.estimate, na.rm = TRUE),
-    median_CH4 = median(CH4_lin_flux.estimate, na.rm = TRUE),
-    n = n()
-  ) %>%
-  arrange(desc(mean_CH4))
-```
 
