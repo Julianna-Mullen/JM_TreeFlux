@@ -817,6 +817,8 @@ for (species in unique(my_data$Species)) {
 ```{r}
 ch4_sensitivity <- my_data %>%
     ungroup() %>%
+    filter(!is.na(CH4_lin_flux.estimate), !is.na(soil_temp_daily_mean)) %>%
+    filter(n() >= 3, .by = ID) %>%
      reframe(
          lm(CH4_lin_flux.estimate ~ soil_temp_daily_mean) %>% tidy(),
          .by = ID ) %>%
@@ -834,6 +836,8 @@ ch4_sensitivity
 ```{r}
 CO2_sensitivity <- my_data %>%
     ungroup() %>%
+    filter(!is.na(CO2_lin_flux.estimate), !is.na(soil_temp_daily_mean)) %>%
+    filter(n() >= 3, .by = ID) %>%
      reframe(
          lm(CO2_lin_flux.estimate ~ soil_temp_daily_mean) %>% tidy(),
          .by = ID ) %>%
