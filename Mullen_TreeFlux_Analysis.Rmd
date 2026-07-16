@@ -306,7 +306,7 @@ ggplot(quarterly_CH4 |> filter(!is_S7),
                     ymax = mean_flux + se), 
                 width = 0.1 ) +
   facet_wrap(~ Species) +
-  labs( title = "Mean CH4 Flux by Species and Plot (2021–2025)",
+  labs( title = "Mean CH4 Flux by Species and Plot (2021–2026)",
         subtitle = "(No S7)",
         x = "Year", y = "Mean CH4 Flux" )
 
@@ -320,7 +320,7 @@ ggplot(quarterly_CO2,
                     ymax = mean_flux + se), 
                 width = 0.1) +
   facet_wrap(~ Species) +
-  labs( title = "Mean CO2 Flux by Species and Plot (2021–2025)",
+  labs( title = "Mean CO2 Flux by Species and Plot (2021–2026)",
         subtitle = "(No S7)",
         x = "Year",
         y = "Mean CO2 Flux" ) 
