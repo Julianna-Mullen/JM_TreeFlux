@@ -79,12 +79,12 @@ soil_temp_daily <- soil_temp_data %>%
 #    TIMESTAMP = as.POSIXct(TIMESTAMP),
     Date = as.Date(TIMESTAMP),
     Value = as.numeric(Value) ) %>%
-  filter(!is.na(Value)) %>%  
+  filter(!is.na(Value)) %>%
   group_by(Site, Plot, Date) %>%
   summarise(
     soil_temp_daily_mean = mean(Value),
     n = n(),
-    coverage = n / 96,      
+    coverage = n / 96,
     .groups = "drop"  )
 print(soil_temp_daily)
 # 96 is the number of recordings per day (24 hours/day × 60 minutes/hour = 1440 minutes/day, 1440 ÷ 15 = 96 measurements/day)
@@ -94,12 +94,12 @@ print(soil_temp_daily)
 ```{r}
 ggplot(soil_temp_daily,
        aes(x = Date, y = soil_temp_daily_mean,
-           color = Plot, group = Plot)) + 
-  geom_line(alpha = 0.7) + 
+           color = Plot, group = Plot)) +
+  geom_line(alpha = 0.7) +
   facet_wrap(~ Site) +
   labs( title = "Daily Mean Soil Temperature by Plot",
         x = "Date",
-        y = "Soil Temperature (°C)" ) 
+        y = "Soil Temperature (°C)" )
 ```
 
 ## Matching the plot names from tree flux and soil temp
@@ -117,7 +117,7 @@ my_data <- my_data %>%
   left_join(
      soil_temp_daily %>%
     select(Plot, Date, soil_temp_daily_mean),
-    by = c("Plot", "Date")) 
+    by = c("Plot", "Date"))
 ```
 
 ## Numerical summaries -----
@@ -203,7 +203,7 @@ ggplot(my_data, aes(x = Date,
   labs(
     title = "CO2 Flux Over Time by Species and Plot",
     x = "Date",
-    y = "CO2 Flux" )
+    y = "CO2 Flux")
 ```
 
 ## Heat Maps
@@ -296,8 +296,7 @@ flood_CO2 <- bind_rows(flood_data) %>%
 
 ## Quarterly Flux for both GHG (raw data)
 ```{r}
-<<<<<<< Updated upstream
-ggplot(quarterly_CH4 |> filter(!is_S7), 
+ggplot(quarterly_CH4 |> filter(!is_S7),
        aes(x = YearQuarter, 
            y = mean_flux,
            color = Plot)) +
@@ -315,24 +314,6 @@ ggplot(quarterly_CO2,
        aes(x = YearQuarter, 
            y = mean_flux, 
            color = Plot, group = Plot)) +
-=======
-ggplot(quarterly_CH4,
-       aes(x = YearQuarter,
-           y = mean_flux,
-           color = Plot,
-           group = Plot)) +
-  geom_line() +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin = mean_flux - se,
-                    ymax = mean_flux + se),
-                width = 0.05) +
-  facet_wrap(~Species) +
-  labs(title = "Mean CO2 Flux by Species and Plot (2021–2025)",
-    x = "Year-Quarter",
-    y = "Mean CH4 Flux" )
-
-ggplot(quarterly_CO2,aes( x = Year, y = mean_flux, color = Plot, group = Plot  )) +
->>>>>>> Stashed changes
   geom_line() +
   geom_point(size = 2) +
   geom_errorbar(aes(ymin = mean_flux - se,
