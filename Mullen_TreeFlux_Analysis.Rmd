@@ -49,6 +49,7 @@ knitr::kable(flood_date)
 FLUX_DATA_FILE <- "tempest_tree_ghg_fluxes.parquet"
 message("Reading ", FLUX_DATA_FILE)
 my_data <- read_parquet(FLUX_DATA_FILE)
+message("Initial dataset rows: ", nrow(my_data))
 
 code_to_name <- c(ACRU = "Red Maple", FAGR = "Beech", LITU = "Tulip Poplar")
 
@@ -62,11 +63,25 @@ tree_map <- read.csv(TREE_MAPPING_FILE,
   distinct(ID, .keep_all = TRUE)
 
 my_data <- my_data %>%
+  ungroup() |> 
   left_join(tree_map, by = "ID") %>%
   mutate(Species = coalesce(Species, Species_from_map)) %>%
   select(-Species_from_map)
 
 message("Trees with NA species: ", sum(is.na(my_data$Species)))
+
+# CO2 fluxes less than zero are physically impossible and probably mean
+# a measurement or instrument problem. Drop 'em
+co2_lt0 <- my_data$CO2_lin_flux.estimate < 0
+message("Dropping ", sum(co2_lt0), " negative CO2 fluxes")
+
+# CO2 is normally low-noise and a low R2 model fit indicates a problem
+# Drop those values
+co2_lowr2 <- my_data$CO2_lin_r.squared < 0.75
+message("Dropping ", sum(co2_lowr2), " low-R2 CO2 fluxes")
+
+my_data |> filter(!co2_lt0, !co2_lowr2) -> my_data
+message("Final dataset rows: ", nrow(my_data))
 ```
 
 ## Prep Soil Temp Data
