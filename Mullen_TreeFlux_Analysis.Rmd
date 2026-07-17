@@ -368,7 +368,8 @@ ggplot(quarterly_CO2,
   scale_shape_manual(values = c(
     T1 = 17,
     T2 = 17,
-    T3 = 17)) +
+    T3 = 17,
+    T4 = 17)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -399,7 +400,8 @@ ggplot(quarterly_CH4,
   scale_shape_manual(values = c(
     T1 = 17,
     T2 = 17,
-    T3 = 17)) +
+    T3 = 17,
+    T4 = 17)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
@@ -502,7 +504,8 @@ ggplot() +
   scale_shape_manual(values = c(
     T1 = 17,
     T2 = 17,
-    T3 = 17 )) +
+    T3 = 17,
+    T4 = 17)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
@@ -528,7 +531,7 @@ ggplot() +  geom_line(
        x = "Year-Quarter",
        y = "CH4 Flux",
        shape = "Flood event" ) +
-  scale_shape_manual(values = c(T1 = 17, T2 = 17, T3 = 17)) +
+  scale_shape_manual(values = c(T1 = 17, T2 = 17, T3 = 17, T4 = 17)) +
   theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
