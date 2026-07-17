@@ -16,7 +16,7 @@ output:
 Welcome to the TEMPEST Flood Tree Greenhouse Gas Flux dataset analysis!
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 9)
 
 library(ggplot2)
 theme_set(theme_bw())
@@ -158,7 +158,7 @@ my_data %>%
   facet_grid(Species ~ .) +
   labs( title = "CH4 Flux by Species (2021–2025)",
     x = "Year",
-    y = "CH4 Flux",
+    y = "CH4 Flux (nmol/m2/s)",
     fill = "Year") +
   theme(legend.position = "right")
 ```
@@ -176,7 +176,7 @@ my_data %>%
   facet_grid(Species ~ .) +
   labs( title = "CO2 Flux by Species (2021–2025)",
     x = "Year",
-    y = "CO2 Flux",
+    y = "CO2 Flux (µmol/m2/s)",
     fill = "Year") +
   theme(legend.position = "right")
 ```
@@ -190,12 +190,14 @@ ggplot(my_data,
        aes(x = Species, y = CH4_lin_flux.estimate, fill = Plot)) +
   geom_boxplot() +
   theme_bw() +
+  ylab("CH4 Flux (nmol/m2/s)") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ggplot(my_data, 
        aes(x = Species,  y = CO2_lin_flux.estimate, fill = Plot)) +
   geom_boxplot() +
   theme_bw() +
+  ylab("CO2 Flux (µmol/m2/s)") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -203,22 +205,22 @@ ggplot(my_data,
 ```{r}
 ggplot(my_data, aes(x = Date, y = CH4_lin_flux.estimate,
                     group = ID, color = Plot)) +
-  geom_line(alpha = 0.2) +
+  geom_line(alpha = 0.75) +
   facet_wrap(~ Species) +
   labs(title = "CH4 Flux Over Time by Species and Plot",
        x = "Date",
-       y = "CH4 Flux")
+       y = "CH4 Flux (nmol/m2/s)")
 
 ggplot(my_data, aes(x = Date,
                     y = CO2_lin_flux.estimate,
                     group = ID,
                     color = Plot)) +
-  geom_line(alpha = 0.2) +
+  geom_line(alpha = 0.75) +
   facet_wrap(~ Species) +
   labs(
     title = "CO2 Flux Over Time by Species and Plot",
     x = "Date",
-    y = "CO2 Flux")
+    y = "CO2 Flux (µmol/m2/s)")
 ```
 
 ## Heat Maps
@@ -232,7 +234,7 @@ ggplot(heat_data_CH4, aes(x = Year, y = Species, fill = mean_flux)) +
   geom_tile() +
   scale_fill_viridis_c() +
   labs( title = "Mean CH4 Flux by Species and Year", x = "Year", y = "Species",
-        fill = "Mean CH4 Flux") + theme_minimal()
+        fill = "Mean CH4 Flux\n(nmol/m2/s)") + theme_minimal()
 seawater_rows <- my_data %>%
   filter(Plot == "Seawater")
 
@@ -245,7 +247,7 @@ ggplot(my_data, aes(x = CO2_lin_flux.estimate, y = CH4_lin_flux.estimate, color 
   geom_point(alpha = 0.4) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "Relationship Between CO2 and CH4 Flux by Species", 
-       x = "CO2 Flux", y = "CH4 Flux",
+       x = "CO2 Flux (µmol/m2/s)", y = "CH4 Flux (nmol/m2/s)",
        color = "Species") +
   theme_minimal()
 ```
@@ -323,7 +325,7 @@ ggplot(quarterly_CH4 |> filter(!is_S7),
   facet_wrap(~ Species) +
   labs( title = "Mean CH4 Flux by Species and Plot (2021–2026)",
         subtitle = "(No S7)",
-        x = "Year", y = "Mean CH4 Flux" )
+        x = "Year", y = "Mean CH4 Flux (nmol/m2/s)" )
 
 ggplot(quarterly_CO2,
        aes(x = YearQuarter, 
@@ -338,7 +340,7 @@ ggplot(quarterly_CO2,
   labs( title = "Mean CO2 Flux by Species and Plot (2021–2026)",
         subtitle = "(No S7)",
         x = "Year",
-        y = "Mean CO2 Flux" ) 
+        y = "Mean CO2 Flux (µmol/m2/s)" ) 
 ```
 
 ## Quarterly Carbon Dioxide Flux with flood averages emphasized
@@ -363,7 +365,7 @@ ggplot(quarterly_CO2,
   facet_wrap(~ Species) +
   labs( title = "Quarterly CO2 Flux with Flood Events Highlighted",
         x = "Year-Quarter",
-        y = "CO2 Flux",
+        y = "CO2 Flux (µmol/m2/s)",
         shape = "Flood event") +
   scale_shape_manual(values = c(
     T1 = 17,
@@ -395,7 +397,7 @@ ggplot(quarterly_CH4,
   facet_wrap(~ Species) +
   labs( title = "Quarterly CH4 Flux with Flood Events Highlighted",
         x = "Year-Quarter",
-        y = "CH4 Flux",
+        y = "CH4 Flux (nmol/m2/s)",
         shape = "Flood event") +
   scale_shape_manual(values = c(
     T1 = 17,
@@ -419,7 +421,8 @@ my_data %>%
   ggplot(aes(x = Date, y = CH4_lin_flux.estimate)) +
   geom_line(alpha = 0.7) +
   facet_wrap(~ ID) +
-  labs(title = "Red Maple CH4 Flux by Individual Tree")
+  labs(y = "CH4 Flux (nmol/m2/s)",
+       title = "Red Maple CH4 Flux by Individual Tree")
 ```
 
 ## S7 CO2 fluxes are normal, though
@@ -465,12 +468,12 @@ ggplot(quarterly_CH4_S7, aes(x = YearQuarter, y = mean_flux)) +
     size = 2  ) +
   labs( title = "S7 Quarterly CH4 Flux with Flood Periods Highlighted",
         x = "Year-Quarter",
-        y = "CH4 Flux") +
+        y = "CH4 Flux (nmol/m2/s)") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-## Quarterly CH4 Flux (S7 excluded from means, shown separately)
+## Quarterly CH4 Flux 
 ```{r}
 ggplot() +
   # OTHER TREES (baseline)
@@ -497,9 +500,10 @@ ggplot() +
     color = "black",
     size = 3 ) +
   facet_wrap(~ Species) +
-  labs( title = "Quarterly CH4 Flux (S7 excluded from means, shown separately)",
+  labs( title = "Quarterly CH4 Flux",
+        subtitle = "(S7 excluded from means, shown separately)",
         x = "Year-Quarter",
-        y = "CH4 Flux",
+        y = "CH4 Flux (nmol/m2/s)",
         shape = "Flood event") +
   scale_shape_manual(values = c(
     T1 = 17,
@@ -529,7 +533,7 @@ ggplot() +  geom_line(
   facet_wrap(~ Species) +
   labs(title = "Quarterly CH4 Flux with Flood Events Across Treatments",
        x = "Year-Quarter",
-       y = "CH4 Flux",
+       y = "CH4 Flux (nmol/m2/s)",
        shape = "Flood event" ) +
   scale_shape_manual(values = c(T1 = 17, T2 = 17, T3 = 17, T4 = 17)) +
   theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -546,7 +550,8 @@ ggplot(my_data, aes(x = soil_temp_daily_mean,
      geom_point(alpha = 0.4) +
      geom_smooth(method = "lm", se = FALSE) +
      facet_wrap(~ Species) +
-     labs(title = "Soil Temperature × Treatment Effects on CH4 Flux")
+     labs(y = "CH4 Flux (nmol/m2/s)",
+          title = "Soil Temperature × Treatment Effects on CH4 Flux")
 
 ggplot(my_data, aes(x = soil_temp_daily_mean,
                   y = CO2_lin_flux.estimate,
@@ -554,7 +559,8 @@ ggplot(my_data, aes(x = soil_temp_daily_mean,
      geom_point(alpha = 0.4) +
      geom_smooth(method = "lm", se = FALSE) +
      facet_wrap(~ Species) +
-     labs(title = "Soil Temperature × Treatment Effects on CO2 Flux")
+     labs(y = "CO2 Flux (µmol/m2/s)",
+          title = "Soil Temperature × Treatment Effects on CO2 Flux")
 ```
 
 ## Nonlinear Temperature Response of CH4 
@@ -565,7 +571,8 @@ ggplot(my_data, aes(soil_temp_daily_mean, CH4_lin_flux.estimate)) +
   geom_point(alpha = 0.4, aes(color = Species)) +
   geom_smooth(method = "loess", se = FALSE) +
   facet_wrap(~ Plot) +
-  labs(title = "Nonlinear Temperature Response of CH4")
+  labs(y = "CH4 Flux (nmol/m2/s)",
+       title = "Nonlinear Temperature Response of CH4")
 ```
 S7 has higher fluxes AND is much more temperature sensitive!
 
@@ -577,7 +584,8 @@ ggplot(my_data, aes(soil_temp_daily_mean, CO2_lin_flux.estimate)) +
   geom_point(alpha = 0.4, aes(color = Species)) +
   geom_smooth(method = "loess", se = FALSE) +
   facet_wrap(~ Plot) +
-  labs(title = "Nonlinear Temperature Response of CO2")
+  labs(y = "CO2 Flux (µmol/m2/s)",
+       title = "Nonlinear Temperature Response of CO2")
 ```
 
 ## Seasonal and Flood-Driven Dynamics of Soil Temperature and GHG Fluxes
@@ -629,7 +637,7 @@ p1 <- ggplot(quarterly_CH4,
              size = 1.5,
              inherit.aes = FALSE) +
   facet_wrap(~Species) +
-  labs(y = "CH4 Flux",
+  labs(y = "CH4 Flux (nmol/m2/s)",
        x = NULL,
        shape = "Flood event") 
 
@@ -652,7 +660,7 @@ p2 <- ggplot(quarterly_CO2,
              size = 1.5,
              inherit.aes = FALSE) +
   facet_wrap(~Species) +
-  labs(y = "CO2 Flux",
+  labs(y = "CO2 Flux (µmol/m2/s)",
        x = NULL,
        shape = "Flood event") 
 
@@ -692,7 +700,7 @@ ggplot(my_data,
      labs(
          title = "Methane Flux vs Soil Temperature by Tree",
          x = "Daily Mean Soil Temperature (°C)",
-         y = "CH4 Flux") 
+         y = "CH4 Flux (nmol/m2/s)") 
 ```
 
 ```{r}
@@ -705,7 +713,7 @@ ggplot(my_data,
      labs(
          title = "Carbon Dioxide Flux vs Soil Temperature by Tree",
          x = "Daily Mean Soil Temperature (°C)",
-         y = "CO2 Flux")
+         y = "CO2 Flux (µmol/m2/s)")
 ```
 
 ## So small its hard to identify patterns and isolate differences
@@ -740,7 +748,7 @@ for(plot in unique(my_data$Plot)) {
     facet_wrap(~ID, scales = "free") +
     labs( title = paste0("Methane Flux vs. Daily Mean Soil Temperature (", plot, " Trees)"),
                      x = "Daily Mean Soil Temperature (°C)",
-                     y = "CH4 Flux")
+                     y = "CH4 Flux (nmol/m2/s)")
   print(p)
 }
 ```
@@ -765,7 +773,7 @@ for(plot in unique(my_data$Plot)) {
     facet_wrap(~ID, scales = "free") +
     labs( title = paste0("Carbon Dioxide Flux vs. Daily Mean Soil Temperature (", plot, " Trees)"),
                      x = "Daily Mean Soil Temperature (°C)",
-                     y = "CO2 Flux")
+                     y = "CO2 Flux (µmol/m2/s)")
   print(p)
 }
 ```
@@ -796,7 +804,7 @@ for (species in unique(my_data$Species)) {
     labs(
       title = paste0("CO2 Flux vs Soil Temperature (", species, " Trees)"),
       x = "Soil Temperature (°C)",
-      y = "CO2 Flux" )
+      y = "CO2 Flux (µmol/m2/s)" )
   print(p)
 }
 ```
@@ -819,7 +827,7 @@ for (species in unique(my_data$Species)) {
     labs(
       title = paste0("CH4 Flux vs Soil Temperature (", species, " Trees)"),
       x = "Soil Temperature (°C)",
-      y = "CH4 Flux" )
+      y = "CH4 Flux (nmol/m2/s)" )
   print(p)
 }
 ```
@@ -1171,7 +1179,7 @@ ggplot(
   labs(
     title = "CH4 Flux Relative to Control Through Time",
     x = "Year-Quarter",
-    y = "Treatment − Control CH4 Flux" ) +
+    y = "Treatment − Control CH4 Flux (nmol/m2/s)" ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -1191,7 +1199,7 @@ ggplot(
   labs(
     title = "CO2 Flux Relative to Control Through Time",
     x = "Year-Quarter",
-    y = "Treatment − Control CO2 Flux"  ) +
+    y = "Treatment − Control CO2 Flux (µmol/m2/s)"  ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -1292,30 +1300,34 @@ ggplot(flood_CH4_daily) +
     title = "CH4 Response During Flood Treatment",
     subtitle = "(excluding S7)",
     x = "Days Since Flood Began",
-    y = "Mean CH4 Flux",
+    y = "CH4 Flux (nmol/m2/s)",
     color = "Treatment" ) 
 
 # CO2 flood response plot
-ggplot(
-  flood_CO2_daily,
-  aes(
-    x = Flood_day,
-    y = mean_CO2,
-    color = Plot,
-    group = interaction(Year, Plot) ) ) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 2) +
+ggplot(flood_CO2_daily) +
+  # background showing flooding period
+  geom_rect(data = flood_date_relative, 
+            aes(xmin = day_start, xmax = day_end, 
+                ymin = -Inf, ymax = Inf),
+            fill = "lightgrey") +
+  # data
+  geom_line(aes(x = Flood_day,
+    y = mean_CO2, color = Plot,
+    group = interaction(Year, Plot)), linewidth = 1) +
+  geom_point(aes(x = Flood_day,
+    y = mean_CO2, color = Plot), size = 2) +
   geom_errorbar(
-    aes(
+    aes(x = Flood_day,
       ymin = mean_CO2 - se_CO2,
       ymax = mean_CO2 + se_CO2 ),
-    width = 0.1  ) +
-  facet_grid(Year ~ Species, scales = "free_x") +
+    width = 0.1 ) +
+  # faceting and labels
+  facet_grid(Species ~ Year, scales = "free") +
   labs(
     title = "CO2 Response During Flood Treatment",
     x = "Days Since Flood Began",
-    y = "Mean CO2 Flux",
-    color = "Treatment")
+    y = "CO2 Flux (µmol/m2/s)",
+    color = "Treatment" ) 
 ```
 
 
