@@ -51,9 +51,6 @@ rsconnect/
 # OS files
 .DS_Store
 
-# Sensor Data
-Sensor_Data/
-
 # Rmarkdown output files
 *.html
 *.docx
