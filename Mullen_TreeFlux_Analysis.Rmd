@@ -1331,4 +1331,11 @@ ggplot(flood_CO2_daily) +
 ```
 
 
+```{r}
+cat("CH4 range:",
+    range(my_data$CH4_lin_flux.estimate, na.rm = TRUE), "\n")
+
+cat("CO2 range:",
+    range(my_data$CO2_lin_flux.estimate, na.rm = TRUE), "\n")
+```
 
