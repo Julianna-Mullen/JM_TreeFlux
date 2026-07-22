@@ -1,0 +1,532 @@
+COMPASS-FME Level 2 sensor data site documentation
+Version: 2-1
+TMP_2023
+Thu Jan 29 20:10:31 2026
+
+
+General information
+—----------------------------------
+Level 2 (L2) data consist of sensor observations from the COMPASS-FME
+synoptic sites, TEMPEST, and DELUGE. Compared to the L1 data, these are
+more consistent (always 15-minute timestamps for the entire year);
+better QA/QC’d (out of bounds, out of service, and extreme outlier
+values are removed); and more complete, with a gap-filled time series
+available alongside the main observations, and additional derived
+(calculated) variables. L2 data are intended to be rapidly and easily
+usable in analyses and simulations.
+
+Site information
+—----------------------------------
+TMP is TEMPEST, the COMPASS-FME ecosystem-scale flooding experiment and
+has three 2000 m2 plots: control ("C"; located at 38.8747N, 76.5519W),
+freshwater ("F"; 38.87403N, 76.5516W), and saltwater ("S"; 38.8744N,
+76.5525W). The TEMPEST experiment is in a mid- to late-successional (~80
+years old) temperate, deciduous coastal forest.
+
+NOTE: Meteorological data for TEMPEST are available in the GCW-W files
+and are from the GCReW met station. See notes in the GCW metadata.
+
+The TEMPEST flood events occurred on the following dates. They
+lasted for ~10 hours each day and delivered ~80,000 gallons to each plot.
+Many data streams are available at 1 or 5 minute frequency during these periods.
+
+Event       | Date       | S-pump_on | S-pump_off | S-vol | F-pump_on | F-pump_off | F-vol 
+----------- | ---------- | --------- | ---------- | ----- | --------- | ---------- | ----- 
+TEST        | 2021-08-25 |           |            |       | 06:00     | 16:00      | 81212 
+            | 2021-09-09 | 06:00     | 16:00      | 76805 |           |            |       
+TEMPEST I   | 2022-06-22 | 05:05     | 14:38      | 70489 | 05:07     | 15:00      | 69452  
+TEMPEST II  | 2023-06-06 | 04:45     | 15:07      | 81206 | 04:45     | 14:50      | 81265   
+            | 2023-06-07 | 04:52     | 15:00      | 80801 | 04:57     | 14:39      | 80811   
+TEMPEST III | 2024-06-11 | 05:10     | 15:36      | 80003 | 05:10     | 15:36      | 79996   
+            | 2024-06-12 | 05:08     | 15:19      | 80008 | 05:10     | 15:25      | 79994   
+            | 2024-06-13 | 05:21     | 15:29      | 80005 | 05:22     | 15:28      | 79989   
+
+NOTES:
+* For the 2021 TEST event, times are estimated and freshwater was applied to both plots
+* "S-pump_on" and "S-pump_off" are the times (EST) water flow started and stopped into the saltwater plot
+* "F-pump_on" and "F-pump_off" are the times (EST) water flow started and stopped into the freshwater plot
+* "S-vol" and "F-vol" are the total volumes (gallons) of water delivered to each plot
+
+NOTE: The TEMPEST AquaTROLL600s were non-vented from 2022 to September
+2024, resulting in too-high (>900 mbar) `gw-pressure` values. These
+have been back-corrected using ERA5 surface pressure data (see PR#397).
+
+Contact for the TEMPEST site: 
+J. Patrick Megonigal megonialp@si.edu
+
+Contacts for TEMPEST data streams: 
+Overall: P. Megonigal; Anya Hopple <anyahopple@gmail.com>
+Sapflow: Stephanie Pennington stephanie.pennington@pnnl.gov; Alice Stearns <stearnsA@si.edu> 
+TEROS: Evan Phillips <PhillipsE@si.edu>; S. Pennington; Peter Regier <peter.regier@pnnl.gov>
+AquaTROLL: E. Phillips; S. Pennington; P. Regier
+Dataloggers: E. Phillips; A. Stearns; Roy Rich <RichR@si.edu>
+
+Key publications:
+Hopple et al.: Attaining freshwater and estuarine-water soil saturation in an 
+ecosystem-scale coastal flooding experiment, Environ. Monit. Assess., 195, 425, 2023.
+http://dx.doi.org/10.1007/s10661-022-10807-0
+
+Regier et al.: Short-term experimental flooding impacts soil
+biogeochemistry but not aboveground vegetation in a coastal forest,
+Proceedings of the National Academy of Sciences, 122, e2511756122, 2025.
+https://doi.org/10.1073/pnas.2511756122
+
+
+Files in this folder
+—----------------------------------
+Files are site- and plot-specific, annual, and have a naming convention
+of {SITE}_{PLOT}_{YEAR}_{VARIABLE}_L2_{VERSION}.parquet
+
+Parquet is a high performance, space efficient format for tabular data.
+These files can be read using R's `arrow` package
+(https://arrow.apache.org/docs/r/), with similar tools available in
+other languages.
+
+Filename                                               Values    Dropped MD5       
+TMP_C_2023_gw-act-cond_L2_v2-1.parquet                  66421          0 c63f01bf  
+TMP_C_2023_gw-bar-pressure_L2_v2-1.parquet              35025          0 69c593a3  
+TMP_C_2023_gw-density_L2_v2-1.parquet                   66421          0 35e04e34  
+TMP_C_2023_gw-depth_L2_v2-1.parquet                     66421          0 b935f434  
+TMP_C_2023_gw-part-pressure_L2_v2-1.parquet             35025          0 c2ad0e4e  
+TMP_C_2023_gw-perc-sat_L2_v2-1.parquet                  35020          7 43885418  
+TMP_C_2023_gw-ph_L2_v2-1.parquet                        35025          0 8311ccc0  
+TMP_C_2023_gw-ph-mv_L2_v2-1.parquet                     35025          0 7ad20970  
+TMP_C_2023_gw-ph-orp_L2_v2-1.parquet                    35025          0 7a572d88  
+TMP_C_2023_gw-pressure-unvented_L2_v2-1.parquet         66307        129 4a6bc30f  
+TMP_C_2023_gw-rdo-conc_L2_v2-1.parquet                  35025          0 1f1d9281  
+TMP_C_2023_gw-resistivity_L2_v2-1.parquet               66421          0 ac64fece  
+TMP_C_2023_gw-salinity_L2_v2-1.parquet                  66421          0 da754247  
+TMP_C_2023_gw-spec-cond_L2_v2-1.parquet                 66421          0 d4726939  
+TMP_C_2023_gw-tds_L2_v2-1.parquet                       66421          0 75b1adc4  
+TMP_C_2023_gw-temperature_L2_v2-1.parquet               65106       1456 3cedce2f  
+TMP_C_2023_gw-temperature-int_L2_v2-1.parquet           35025          0 d1bd37d0  
+TMP_C_2023_gw-voltage-ext_L2_v2-1.parquet               35025          0 49e3e0ac  
+TMP_C_2023_sapflow-3.5cm_L2_v2-1.parquet               619803      17464 230cee39  
+TMP_C_2023_sapflow-5cm_L2_v2-1.parquet                 196844       2768 a5df94a5  
+TMP_C_2023_soil-EC-15cm_L2_v2-1.parquet               1212809          0 42ce7629  
+TMP_C_2023_soil-EC-30cm_L2_v2-1.parquet                168683          0 69e2b36c  
+TMP_C_2023_soil-EC-5cm_L2_v2-1.parquet                 167265          0 3a3eb79d  
+TMP_C_2023_soil-salinity-15cm_L2_v2-1.parquet          991070          0 4439f672  
+TMP_C_2023_soil-salinity-30cm_L2_v2-1.parquet          162715          0 b1b00bc1  
+TMP_C_2023_soil-salinity-5cm_L2_v2-1.parquet           120400          0 328de393  
+TMP_C_2023_soil-temp-15cm_L2_v2-1.parquet             1212205        444 a124af34  
+TMP_C_2023_soil-temp-30cm_L2_v2-1.parquet              168553         49 3230bcd3  
+TMP_C_2023_soil-temp-5cm_L2_v2-1.parquet               167234         19 9e828dd5  
+TMP_C_2023_soil-vwc-15cm_L2_v2-1.parquet              1035428     978579 efc9cba6  
+TMP_C_2023_soil-vwc-30cm_L2_v2-1.parquet               168295        116 a1e06c75  
+TMP_C_2023_soil-vwc-5cm_L2_v2-1.parquet                148140      39319 d6bc1b80  
+TMP_F_2023_gw-act-cond_L2_v2-1.parquet                  98211          0 64170e20  
+TMP_F_2023_gw-bar-pressure_L2_v2-1.parquet              32815          0 886d4b4e  
+TMP_F_2023_gw-density_L2_v2-1.parquet                   98211          0 29c99886  
+TMP_F_2023_gw-depth_L2_v2-1.parquet                    100059          0 491a9983  
+TMP_F_2023_gw-part-pressure_L2_v2-1.parquet             30967          0 0237c439  
+TMP_F_2023_gw-perc-sat_L2_v2-1.parquet                  30853        115 1f830541  
+TMP_F_2023_gw-ph_L2_v2-1.parquet                        30958          0 853cc55b  
+TMP_F_2023_gw-ph-mv_L2_v2-1.parquet                     30958          0 6b4795df  
+TMP_F_2023_gw-ph-orp_L2_v2-1.parquet                    30958          0 57fd1841  
+TMP_F_2023_gw-pressure-unvented_L2_v2-1.parquet        100057          6 3cae1700  
+TMP_F_2023_gw-rdo-conc_L2_v2-1.parquet                  30967          0 41bedaf9  
+TMP_F_2023_gw-resistivity_L2_v2-1.parquet               98211          0 4572efc1  
+TMP_F_2023_gw-salinity_L2_v2-1.parquet                  98211          0 55e70546  
+TMP_F_2023_gw-spec-cond_L2_v2-1.parquet                 98211          0 f545ec9a  
+TMP_F_2023_gw-tds_L2_v2-1.parquet                       98211          0 984d3fd3  
+TMP_F_2023_gw-temperature_L2_v2-1.parquet               96823       1393 ec847d55  
+TMP_F_2023_gw-temperature-int_L2_v2-1.parquet           32815          0 2cfede20  
+TMP_F_2023_gw-voltage-ext_L2_v2-1.parquet               32815          0 c1682573  
+TMP_F_2023_sapflow-3.5cm_L2_v2-1.parquet               692615       7632 d47a509c  
+TMP_F_2023_sapflow-5cm_L2_v2-1.parquet                 171263       1736 1d956880  
+TMP_F_2023_soil-EC-15cm_L2_v2-1.parquet               1260720          0 14197c9b  
+TMP_F_2023_soil-EC-30cm_L2_v2-1.parquet                175151          0 36d89972  
+TMP_F_2023_soil-EC-5cm_L2_v2-1.parquet                 175132          0 a50b9d27  
+TMP_F_2023_soil-salinity-15cm_L2_v2-1.parquet         1243166          0 fd9818ec  
+TMP_F_2023_soil-salinity-30cm_L2_v2-1.parquet          151313          0 bb02f824  
+TMP_F_2023_soil-salinity-5cm_L2_v2-1.parquet           174551          0 ea2b96d9  
+TMP_F_2023_soil-temp-15cm_L2_v2-1.parquet             1260720        553 aebb3418  
+TMP_F_2023_soil-temp-30cm_L2_v2-1.parquet              175151         40 7b6a8e9b  
+TMP_F_2023_soil-temp-5cm_L2_v2-1.parquet               175127         40 f91d97a3  
+TMP_F_2023_soil-vwc-15cm_L2_v2-1.parquet              1260720       1106 8dc4dd8c  
+TMP_F_2023_soil-vwc-30cm_L2_v2-1.parquet               175140         80 4be2f696  
+TMP_F_2023_soil-vwc-5cm_L2_v2-1.parquet                175127         80 4988db80  
+TMP_S_2023_gw-act-cond_L2_v2-1.parquet                  69195          0 7eb9f98c  
+TMP_S_2023_gw-bar-pressure_L2_v2-1.parquet              34155          0 f3dda81c  
+TMP_S_2023_gw-density_L2_v2-1.parquet                   69195          0 ddcf2ff4  
+TMP_S_2023_gw-depth_L2_v2-1.parquet                     69195          0 54279087  
+TMP_S_2023_gw-part-pressure_L2_v2-1.parquet             34155          0 61d73670  
+TMP_S_2023_gw-perc-sat_L2_v2-1.parquet                  34145         11 9bf06a2f  
+TMP_S_2023_gw-ph_L2_v2-1.parquet                        34155          0 5447e56c  
+TMP_S_2023_gw-ph-mv_L2_v2-1.parquet                     34155          0 243b3890  
+TMP_S_2023_gw-ph-orp_L2_v2-1.parquet                    34155          0 7b0333b2  
+TMP_S_2023_gw-pressure-unvented_L2_v2-1.parquet         69195          0 33b97c86  
+TMP_S_2023_gw-rdo-conc_L2_v2-1.parquet                  34155          0 65630b65  
+TMP_S_2023_gw-resistivity_L2_v2-1.parquet               69195          0 e3d36a6a  
+TMP_S_2023_gw-salinity_L2_v2-1.parquet                  69195          0 93feddd4  
+TMP_S_2023_gw-spec-cond_L2_v2-1.parquet                 69195          0 d9a12195  
+TMP_S_2023_gw-tds_L2_v2-1.parquet                       69195          0 3f37448e  
+TMP_S_2023_gw-temperature_L2_v2-1.parquet               68066       1650 6dc1978f  
+TMP_S_2023_gw-temperature-int_L2_v2-1.parquet           34155          0 ced06401  
+TMP_S_2023_gw-voltage-ext_L2_v2-1.parquet               34155          0 5aa9f8b4  
+TMP_S_2023_sapflow-3.5cm_L2_v2-1.parquet               693379       1021 f2c86800  
+TMP_S_2023_sapflow-5cm_L2_v2-1.parquet                 181391         26 854d7c3f  
+TMP_S_2023_soil-EC-15cm_L2_v2-1.parquet               1204685          0 3c7bb4de  
+TMP_S_2023_soil-EC-30cm_L2_v2-1.parquet                167217          0 36675ca8  
+TMP_S_2023_soil-EC-5cm_L2_v2-1.parquet                 167207          0 83a40269  
+TMP_S_2023_soil-salinity-15cm_L2_v2-1.parquet         1138254          0 9e0f231b  
+TMP_S_2023_soil-salinity-30cm_L2_v2-1.parquet          151805          0 7bab40e8  
+TMP_S_2023_soil-salinity-5cm_L2_v2-1.parquet           166741          0 77d83fe7  
+TMP_S_2023_soil-temp-15cm_L2_v2-1.parquet             1177127     169405 f1d9791d  
+TMP_S_2023_soil-temp-30cm_L2_v2-1.parquet              167211         19 5737e177  
+TMP_S_2023_soil-temp-5cm_L2_v2-1.parquet               167201         10 7f40c11b  
+TMP_S_2023_soil-vwc-15cm_L2_v2-1.parquet              1204640        166 e69a9f4d  
+TMP_S_2023_soil-vwc-30cm_L2_v2-1.parquet               154913      15072 d9c51e25  
+TMP_S_2023_soil-vwc-5cm_L2_v2-1.parquet                167201         23 60714ec6  
+
+
+File columns
+—----------------------------------
+Site            Site code; see site info above (character)
+Plot            Plot code; see site info above (character)
+TIMESTAMP       Timestamp in Etc/GMT+5 (POSIXct)
+Instrument      Name of measurement instrument (character)
+Instrument_ID   Identifier of instrument within plot (character)
+Sensor_ID       Identifier of individual sensor, tree, etc. being measured (character)
+Location        Spatial location; for TEMPEST, grid square (character)
+research_name   Measurement name (character)
+Value           Observed value (numeric). The no-data value is ''
+N_avg           Number of L1 values averaged to produce this L2 datum (integer). If zero and a value is present, linear interpolation was used to fill a short gap
+N_drop          Number of values dropped before averaging for being out of bounds, out of service, or failing QA/QC (integer)
+Value_MAC       Complete timeseries with mean annual cycle (MAC) algorithm used for gaps, see quick start for detailed information
+
+
+Variable definitions: (DLR = datalogger; DRV = derived)
+—----------------------------------
+research_name        Type  Units      Description
+battery-voltage      DLR   V          Battery voltage of the data logger
+solar-voltage        DLR   V          Solar/line voltage of the data logger
+sapflow-3.5cm        DLR   mV         Raw sap flow at 3.5 cm depth
+sapflow-5cm          DLR   mV         Raw sap flow at 5 cm depth
+redox-5cm            DLR   mV         Redox at 5 cm depth; each sensor measures two values based on electrode "A" or "B" reference probes
+redox-10cm           DLR   mV         Redox at 10 cm depth; each sensor measures two values based on electrode "A" or "B" reference probes
+redox-15cm           DLR   mV         Redox at 15 cm depth; each sensor measures two values based on electrode "A" or "B" reference probes
+redox-20cm           DLR   mV         Redox at 20 cm depth; each sensor measures two values based on electrode "A" or "B" reference probes
+redox-35cm           DLR   mV         Redox at 35 cm depth; each sensor measures two values based on electrode "A" or "B" reference probes
+redox-55cm           DLR   mV         Redox at 55 cm depth; each sensor measures two values based on electrode "A" or "B" reference probes
+soil-vwc-5cm         DLR   m3/m3      Soil volumetric water content at 5 cm calibrated for mineral soil
+soil-temp-5cm        DLR   degC       Soil temperature at 5 cm
+soil-EC-5cm          DLR   μS/cm     Soil electrical conductivity at 5 cm
+soil-vwc-10cm        DLR   m3/m3      Soil volumetric water content at 10 cm calibrated for mineral soil
+soil-temp-10cm       DLR   degC       Soil temperature at 10 cm
+soil-EC-10cm         DLR   μS/cm     Soil electrical conductivity at 10 cm
+soil-vwc-15cm        DLR   m3/m3      Soil volumetric water content at 15 cm calibrated for mineral soil
+soil-temp-15cm       DLR   degC       Soil temperature at 15 cm
+soil-EC-15cm         DLR   μS/cm     Soil electrical conductivity at 15 cm
+soil-vwc-30cm        DLR   m3/m3      Soil volumetric water content at 30 cm calibrated for mineral soil
+soil-temp-30cm       DLR   degC       Soil temperature at 30 cm
+soil-EC-30cm         DLR   μS/cm     Soil electrical conductivity at 30 cm
+soil-vwc-40cm        DLR   m3/m3      Soil volumetric water content at 40 cm calibrated for mineral soil
+soil-temp-40cm       DLR   degC       Soil temperature at 40 cm
+soil-EC-40cm         DLR   μS/cm     Soil electrical conductivity at 40 cm
+gw-bar-pressure      DLR   mmHg       Barometric pressure
+gw-temperature       DLR   degC       Groundwater temperature
+gw-temperature-int   DLR   degC       Internal temperature
+gw-act-cond          DLR   μS/cm     Groundwater conductivity
+gw-spec-cond         DLR   μS/cm     Groundwater specific conductivity (normalized to 25C reference temperature)
+gw-salinity          DLR   PSU        Groundwater salinity
+gw-tds               DLR   ppt        Groundwater total dissolved solids
+gw-density           DLR   g/cm3      Groundwater density
+gw-resistivity       DLR   ohm-cm     Groundwater resistivity (reciprocal of conductivity)
+gw-ph                DLR   unitless   Groundwater pH
+gw-ph-mv             DLR   mV         Groundwater pH (in mV)
+gw-ph-orp            DLR   mV         Groundwater oxidation-reduction potential
+gw-rdo-conc          DLR   mg/L       Groundwater dissolved oxygen concentration
+gw-perc-sat          DLR   %          Groundwater dissolved oxygen concentration (100% saturation)
+gw-part-pressure     DLR   Torr       Groundwater dissolved oxygen partial pressure
+gw-pressure-unvented DLR   mbar       Unvented pressure, not corrected for barometric pressure
+gw-pressure-vented   DLR   mbar       Vented pressure, corrected for barometric pressure
+gw-depth             DLR   cm         Calculated groundwater depth
+gw-voltage-ext       DLR   V          External battery voltage coming into the Aquatroll
+gw-battery           DLR   %          Internal battery percentage
+wx-slr-fd15          DLR   MJ/m2      Average solar flux over 15 minute period
+wx-slr-tf15          DLR   W/m2       Total solar flux in over minute period
+wx-rain15            DLR   mm         Total rain over 15 minute period
+wx-windspeed15       DLR   m/s        Wind speed
+wx-winddir15         DLR   degrees    Wind direction
+wx-winddir-sd115     DLR   degrees    Standard deviation of wind direction part of CS windvector function
+wx-maxws15           DLR   m/s        Maximum wind speed in 15 minute period
+wx-maxws-tmx15       DLR   m/s        Time of maximum windspeed in 15 minute period
+wx-invalid-wind15    DLR   count      Total invalid wind measurements over 15 minute period
+wx-tempavg15         DLR   degC       Average air temperature over 15 minute period
+wx-tempmax15         DLR   degC       Maximum air temperature in 15 minute period
+wx-temptmx15         DLR              Time of maximum air temperature in 15 minute period
+wx-tempmin15         DLR   degC       Minimum air temperature in 15 minute period
+wx-temptmn15         DLR              Time of minimum air temperature in 15 minute period
+wx-vappress15        DLR   mbar       Average vapor pressure over 15 minute period
+wx-barpress15        DLR   mbar       Barometric pressure
+wx-bpmax15           DLR   mbar       Maximum barometric pressure in 15 minute period
+wx-bptmx15           DLR              Time of maximum barometric pressure in 15 minute period
+wx-bpmin15           DLR   mbar       Minimum barometric pressure in 15 minute period
+wx-bptmn15           DLR              Time of minimum barometric pressure in 15 minute period
+wx-rh15              DLR   perc       Relative humidity
+wx-rht15             DLR   degC       Average temperature of humidity sensor over 15 minute period
+wx-vpdmax15          DLR   kPa        Maximum vapor pressure deficit in 15 minutes period
+wx-vpdmin15          DLR   kPa        Minimum vapor pressure deficit in 15 minutes period
+wx-vpdtmx15          DLR              Time of maximum vapor pressure deficit in 15 minutes period
+wx-vpdtmn15          DLR              Time of minimum vapor pressure deficit in 15 minutes period
+wx-tilt-ns15         DLR   degrees    Average degree of sensor tilt in the N/S direction over 15 minute period
+wx-tilt-we15         DLR   degrees    Average degree of sensor tilt in the E/W direction over 15 minute period
+wx-strikes15         DLR   count      Total lightning strikes over 15 minute period
+wx-dist-min15        DLR   km         Minimum lightning strike distance in 15 minute time period
+wx-dist-tmn15        DLR              Time of minimum lightning stike distance in 15 minute time period
+wx-par-den15         DLR   µmol/m2/s Average photosynthetically active radiation (PAR) flux density over 15 minute period; site specific correction factor applied
+wx-par-tot15         DLR   mmol/m2    Sum of total photosynthetically active radiation (PAR) flux density over 15 minute period
+wx-rain24            DLR   mm         Sum of rain accumulation over 24 hr period
+wx-slr-fd24          DLR   W/m2       Mean solar flux density over 24 hr period
+wx-slr-tf24          DLR   MJ/m2      Sum of solar flux density over 24 hr period
+wx-winderrors24      DLR              Sum of wind error code over 24 hr period (wind data is invalid if error >0)
+wx-maxws24           DLR   m/s        Maximum wind speed (10s gust) over 24 hr period
+wx-maxws-tmx24       DLR              Time of maximum wind speed over 24 hr period
+wx-tempavg24         DLR   degC       Average air temperature over 24 hr period
+wx-tempmax24         DLR   degC       Maximum air temperature over 24 hr period
+wx-temptmx24         DLR              Time of maximum air temperature over 24 hr period
+wx-tempmin24         DLR   degC       Minimum air temperature over 24 hr period
+wx-temptmn24         DLR              Time of minimum air temperature over 24 hr period
+wx-vappress24        DLR   mbar       Mean vapor pressure over 24 hr period
+wx-barpress24        DLR   mbar       Barometric pressure
+wx-bpmax24           DLR   mbar       Maximum barometric pressure over 24 hr period
+wx-bptmx24           DLR              Time of maximum barometric pressure over 24 hr period
+wx-bpmin24           DLR   mbar       Minimum barometric pressure over 24 hr period
+wx-bptmn24           DLR              Time of minimum barometric pressure over 24 hr period
+wx-rh24              DLR   perc       Maximum relative humidity over 24 hr period
+wx-rht24             DLR   perc       Minimum relative humidity over 24 hr period
+wx-rhtmax24          DLR   degC       Maximum temperature of humidity sensor over 24 hr period
+wx-rhtmin24          DLR   degC       Minimum temperature of humidity sensor over 24 hr period
+wx-tilt-ns24         DLR   degrees    Maximum degree of sensor tilt in the N/S direction over 24 hr period
+wx-vpd24             DLR   kPa        Average vapor pressure deficit in 24 hr period
+wx-vpdmax24          DLR   kPa        Maximum vapor pressure deficit in 24 hr period
+wx-vpdmin24          DLR   kPa        Minimum vapor pressure deficit in 24 hr period
+wx-vpdtmx24          DLR              Time of maximum vapor pressure deficit in 24 hr period
+wx-vpdtmn24          DLR              Time of minimum vapor pressure deficit in 24 hr period
+wx-tilt-we24         DLR   degrees    Maximum degree of sensor tilt in the E/W direction over 24 hr period
+wx-par-den24         DLR   µmol/m2/s Average photosynthetically active radiation (PAR) flux density over 24 hr period; site specific correction factor applied
+wx-par-tot24         DLR   mmol/m2    Sum of total photosynthetically active radiation (PAR) flux density over 24 hr period
+wx-vp15              DLR   kPa        Vapor pressure, = RH*SVP/100; from the GCREW met station and only appears at GCW-W
+wx-vpd15             DLR   kPa        Vapor pressure deficit
+wx-svp15             DLR   kPa        Saturated vapor pressure; from the GCREW met station and only appears at GCW-W
+wx-minws15           DLR   m/s        Maximum wind speed in 15 minute period; from the GCREW met station and only appears at GCW-W
+wx-gcrew-rain15      DLR   cm         Total rain over 15 minute period IN CENTIMETERS; from the GCREW met station and only appears at GCW-W
+sonde-conductivity   DLR   mS/cm      Water conductivity
+sonde-fdom           DLR   QSU        Fluorescent dissolved organic matter concentration, Quinine Sulfate Units
+sonde-fdom-rfu       DLR   RFU        Fluorescent dissolved organic matter concentration, Relative Fluorescent Units
+sonde-nlf-cond       DLR   mS/cm      Non-linear function conductivity
+sonde-odo-sat        DLR   %          Dissolved oxygen concentration, percent air saturation
+sonde-odo-local      DLR   % saturation 
+sonde-odo-mgl        DLR   mg/L       Dissolved oxygen concentration, milligrams per liter
+sonde-pressure       DLR   psia       Water pressure
+sonde-salinity       DLR   ppt        Water salinity
+sonde-spcond         DLR   mS/cm      Water specific conductivity (compensated to 25 degC)
+sonde-wiperpos       DLR   mV         
+sonde-ph             DLR   unitless   Water pH
+sonde-ph-mv          DLR   mV         
+sonde-temp           DLR   C          Water temperature
+sonde-depth          DLR   m          Sonde depth
+sonde-battery        DLR   V          Sonde battery voltage
+sonde-cable          DLR   V          Sonde cable power
+sonde-wipercur       DLR   mA         Wiper brush current
+sonde-tss            DLR   mg/L       Total suspended solids concentration
+sonde-orp            DLR   mV         Water oxidation reduction potential
+sonde-tds            DLR   mg/L       Total dissolved solids concentration
+sonde-vpos           DLR   m          
+sonde-turbidity      DLR   FNU        Turbidity, indirect measurement of the suspended solid concentration in water
+sonde-turb-raw       DLR              
+sonde-chlorophyl     DLR   µg/L      Chlorophyll concentration
+sonde-chl-rfu        DLR   RFU        Chlorophyll (relative fluorescence units)
+sonde-chl-raw        DLR   unitless   Chlorophyll (raw value)
+sonde-chl-cells      DLR   cells/mL   Chlorophyll cell count
+sonde-rhodamine      DLR   µg/L      Rhodamine concentration
+sonde-tal            DLR   cells/mL   Total algae concentration
+sonde-bga-pc         DLR   µg/L      Blue-green algae concentration
+sonde-bga-pc-raw     DLR   unitless   Blue-green algae (raw value)
+soil-salinity-5cm    DRV   ppt        Salinity calculated based on TEROS VWC, T, and EC; from Machado-Silva and Hilhorst (2000)
+soil-salinity-10cm   DRV   ppt        Salinity calculated based on TEROS VWC, T, and EC; from Machado-Silva and Hilhorst (2000)
+soil-salinity-15cm   DRV   ppt        Salinity calculated based on TEROS VWC, T, and EC; from Machado-Silva and Hilhorst (2000)
+soil-salinity-30cm   DRV   ppt        Salinity calculated based on TEROS VWC, T, and EC; from Machado-Silva and Hilhorst (2000)
+soil-salinity-40cm   DRV   ppt        Salinity calculated based on TEROS VWC, T, and EC; from Machado-Silva and Hilhorst (2000)
+gw-wl-below-surface  DRV   m          Water level, where negative values are below the ground surface; see below
+
+
+Derived variables 
+—---------------------------------- 
+Level 2 data include _derived_ variables ("DRV" above) that are not
+directly measured but calculated from other variables, and perhaps
+external data.
+
+`soil-salinity-Xcm`: Soil water salinity at X cm below the surface. This
+is calculated from TEROS variables VWC, T, and EC, following Hilhorst
+(2000; 10.2136/sssaj2000.6461922x) and METER Group protocols that
+convert TEROS EC to pore water EC and then salinity.
+
+`gw-wl-below-surface`: Groundwater level measured in meters relative to
+the ground surface, where negative values indicate water levels below
+the ground surface and positive values indicate water levels above the
+ground surface. This is calculated based on pressure and water density
+measurements made by AquaTroll sensors, as well as well dimensions
+measured during sensor deployment.
+
+
+Linear interpolation
+—----------------------------------
+*Short* gaps in the time series are filled by linear interpolation;
+this is a separate step that the mean-annual-cycle gap-filling step.
+This table gives the maximum gaps filled by this interpolation.
+
+Variable             Max_interpolation Notes               
+battery-voltage      1 hour          No QAQC             
+sapflow-3.5cm        1 hour          --                  
+soil-vwc-5cm         1 hour          --                  
+soil-temp-5cm        1 hour          --                  
+soil-EC-5cm          1 hour          Too variable; no QAQC
+soil-vwc-10cm        2 hours         Come back to this   
+soil-temp-10cm       2 hours         --                  
+soil-EC-10cm         2 hours         Too variable; no QAQC
+soil-vwc-15cm        2 hours         --                  
+soil-temp-15cm       2 hours         --                  
+soil-EC-15cm         2 hours         Too variable; no QAQC
+soil-vwc-30cm        2 hours         Come back to this   
+soil-temp-30cm       3 hours         --                  
+soil-EC-30cm         3 hours         Too variable; no QAQC
+soil-vwc-40cm        3 hours         --                  
+soil-temp-40cm       3 hours         --                  
+soil-EC-40cm         3 hours         --                  
+gw-salinity          1 hour          Too variable; no QAQC
+gw-pressure-vented   1 hour          Too variable; no QAQC
+gw-pressure-unvented 1 hour          Too variable; no QAQC
+gw-density           1 hour          Too variable; no QAQC
+gw-temperature       1 hour          --                  
+wx-slr-fd15          1 hour          Too variable; no QAQC
+wx-rain15            1 hour          Too variable; no QAQC
+wx-tempavg15         1 hour          --                  
+wx-par-den15         1 hour          Too variable; no QAQC
+wx-rh15              1 hour          --                  
+wx-gcrew-rain15      1 hour          Files?              
+sonde-odo-mgl        1 hour          --                  
+sonde-fdom           1 hour          --                  
+sonde-ph             1 hour          --                  
+sonde-orp            1 hour          --                  
+sonde-pressure       1 hour          --                  
+sonde-salinity       1 hour          --                  
+sonde-spcond         1 hour          --                  
+gw-act-cond          1 hour          --                  
+gw-bar-pressure      1 hour          Files?              
+gw-battery           1 hour          No QAQC             
+gw-depth             1 hour          Files?              
+gw-part-pressure     1 hour          Files?              
+gw-perc-sat          1 hour          Files?              
+gw-ph                1 hour          --                  
+gw-ph-mv             1 hour          --                  
+gw-ph-orp            1 hour          --                  
+gw-rdo-conc          1 hour          --                  
+gw-resistivity       1 hour          Files?              
+gw-spec-cond         1 hour          --                  
+gw-tds               1 hour          Files?              
+gw-temperature-int   1 hour          --                  
+gw-voltage-ext       1 hour          --                  
+redox-5cm            1 hour          --                  
+redox-10cm           1 hour          --                  
+redox-15cm           1 hour          --                  
+redox-20cm           1 hour          --                  
+redox-35cm           1 hour          --                  
+redox-55cm           1 hour          --                  
+sapflow-5cm          1 hour          --                  
+solar-voltage        1 hour          No QAQC             
+sonde-battery        1 hour          Files?              
+sonde-cable          1 hour          --                  
+sonde-conductivity   1 hour          Files?              
+sonde-depth          1 hour          --                  
+sonde-fdom-rfu       1 hour          --                  
+sonde-nlf-cond       1 hour          Files?              
+sonde-odo-local      1 hour          Files?              
+sonde-odo-sat        1 hour          --                  
+sonde-ph-mv          1 hour          --                  
+sonde-tds            1 hour          --                  
+sonde-temp           1 hour          --                  
+sonde-tss            1 hour          --                  
+sonde-turb-raw       1 hour          Files?              
+sonde-turbidity      1 hour          --                  
+sonde-vpos           1 hour          --                  
+sonde-wipercur       1 hour          --                  
+sonde-wiperpos       1 hour          Too variable; no QAQC
+sonde-chlorophyl     1 hour          --                  
+sonde-chl-rfu        1 hour          --                  
+sonde-chl-raw        1 hour          --                  
+sonde-chl-cells      1 hour          --                  
+sonde-rhodamine      1 hour          --                  
+sonde-tal            1 hour          --                  
+sonde-bga-pc         1 hour          --                  
+sonde-bga-pc-raw     1 hour          --                  
+wx-barpress15        1 hour          Files?              
+wx-bpmax15           1 hour          Files?              
+wx-bpmax24           1 hour          Files?              
+wx-bpmin15           1 hour          Files?              
+wx-bpmin24           1 hour          Files?              
+wx-bptmn15           1 hour          Files?              
+wx-bptmn24           1 hour          Files?              
+wx-bptmx15           1 hour          Files?              
+wx-bptmx24           1 hour          Files?              
+wx-dist-min15        1 hour          --                  
+wx-dist-tmn15        1 hour          No QAQC             
+wx-invalid-wind15    1 hour          No QAQC             
+wx-maxws-tmx15       1 hour          Files?              
+wx-maxws-tmx24       1 hour          Files?              
+wx-maxws15           1 hour          Too variable; no QAQC
+wx-maxws24           1 hour          Too variable; no QAQC
+wx-minws15           1 hour          Files?              
+wx-par-den24         1 hour          --                  
+wx-par-tot15         1 hour          Too variable; no QAQC
+wx-par-tot24         1 hour          --                  
+wx-rain24            1 hour          Too variable; no QAQC
+wx-rh24              1 hour          Too variable; no QAQC
+wx-rht15             1 hour          --                  
+wx-rht24             1 hour          Too variable; no QAQC
+wx-rhtmax24          1 hour          --                  
+wx-rhtmin24          1 hour          --                  
+wx-slr-fd24          1 hour          --                  
+wx-slr-tf15          1 hour          Too variable; no QAQC
+wx-slr-tf24          1 hour          --                  
+wx-strikes15         1 hour          Too variable; no QAQC
+wx-svp15             1 hour          Files?              
+wx-tempavg24         1 hour          --                  
+wx-tempmax15         1 hour          --                  
+wx-tempmax24         1 hour          --                  
+wx-tempmin15         1 hour          --                  
+wx-tempmin24         1 hour          --                  
+wx-temptmn15         1 hour          --                  
+wx-temptmn24         1 hour          --                  
+wx-temptmx15         1 hour          --                  
+wx-temptmx24         1 hour          --                  
+wx-tilt-ns15         1 hour          --                  
+wx-tilt-ns24         1 hour          --                  
+wx-tilt-we15         1 hour          --                  
+wx-tilt-we24         1 hour          --                  
+wx-vappress15        1 hour          --                  
+wx-vappress24        1 hour          --                  
+wx-vp15              1 hour          Files?              
+wx-vpd15             1 hour          Files?              
+wx-vpdmax15          1 hour          --                  
+wx-vpdmin15          1 hour          --                  
+wx-vpdtmx15          1 hour          --                  
+wx-vpdtmn15          1 hour          --                  
+wx-vpd24             1 hour          --                  
+wx-vpdmax24          1 hour          --                  
+wx-vpdmin24          1 hour          --                  
+wx-vpdtmx24          1 hour          --                  
+wx-vpdtmn24          1 hour          --                  
+wx-winddir-sd115     1 hour          Too variable; no QAQC
+wx-winddir15         1 hour          Too variable; no QAQC
+wx-winderrors24      1 hour          Files?              
+wx-windspeed15       1 hour          Too variable; no QAQC
+wx-barpress24        1 hour          --                  
+soil-salinity-5cm    --              Derived variable    
+soil-salinity-10cm   --              Derived variable    
+soil-salinity-15cm   --              Derived variable    
+soil-salinity-30cm   --              Derived variable    
+soil-salinity-40cm   --              Derived variable    
+gw-wl-below-surface  --              Derived variable    
