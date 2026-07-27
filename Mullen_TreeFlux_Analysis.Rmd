@@ -1646,5 +1646,14 @@ q10_CH4results %>%
          mean_Q10 = mean(Q10, na.rm = TRUE)
      ) %>%
      arrange(Species)
+
+q10_CO2results %>%
+  group_by(Species) %>%
+     summarise(
+         min_Q10 = min(Q10, na.rm = TRUE),
+         max_Q10 = max(Q10, na.rm = TRUE),
+         mean_Q10 = mean(Q10, na.rm = TRUE)
+     ) %>%
+     arrange(Species)
 ```
 
